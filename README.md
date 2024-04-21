@@ -7,13 +7,15 @@
 Some features in this application
 
 - [x] Login with Firebase Authentication
+- [ ] User list
 - [ ] Add users with roles
-  - reset password
-  - disable user
-- [ ] List RACS with filters
+  - [ ] reset password
+  - [ ] disable user
+- [x] List RACS pagination
+  - [ ] Filter list
 - [ ] Dashboard RACS
-  - dates filters
-  - download pdf
+  - [ ] dates filters
+  - [ ] download pdf
 - [ ] Deploy vercel
 
 ## Install and run

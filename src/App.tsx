@@ -1,5 +1,3 @@
-import { RouterProvider } from "react-router-dom"
-
 import { COLORS } from "@common/constants"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 
@@ -17,7 +15,7 @@ const defaultTheme = createTheme({
       main: COLORS.SECONDARY
     },
     text: {
-      secondary: COLORS.WHITE,
+      secondary: COLORS.SECONDARY,
       primary: COLORS.PRIMARY
     }
   }

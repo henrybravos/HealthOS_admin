@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 
+import { LOCAL_STORAGE } from "@common/constants"
 import { useAppContext } from "@context/useAppContext"
 import { Face, Menu as MenuIcon } from "@mui/icons-material"
 import {
@@ -59,11 +60,13 @@ interface ILayout {
 
 export const Layout = ({ children, title }: ILayout) => {
   const { userInfo } = useAppContext()
-  const openLs = localStorage.getItem("LS_DRAWER_OPEN")
-  const [open, setOpen] = useState(openLs === "true")
+  LOCAL_STORAGE
+  const [openDrawer, setOpenDrawer] = useState(
+    localStorage.getItem(LOCAL_STORAGE.DRAWER_OPEN) === "true"
+  )
   const toggleDrawer = () => {
-    setOpen(!open)
-    localStorage.setItem("LS_DRAWER_OPEN", !open + "")
+    setOpenDrawer(!openDrawer)
+    localStorage.setItem(LOCAL_STORAGE.DRAWER_OPEN, !openDrawer + "")
   }
   const {
     palette: { text }
@@ -75,7 +78,7 @@ export const Layout = ({ children, title }: ILayout) => {
   return (
     <Box sx={{ display: "flex" }} height="100%">
       <CssBaseline />
-      <AppBar position="absolute" color="primary" open={open}>
+      <AppBar position="absolute" color="primary" open={openDrawer}>
         <Toolbar
           sx={{
             pr: "24px" // keep right padding when drawer closed
@@ -88,7 +91,7 @@ export const Layout = ({ children, title }: ILayout) => {
             onClick={toggleDrawer}
             sx={{
               marginRight: "36px",
-              ...(open && { display: "none" })
+              ...(openDrawer && { display: "none" })
             }}
           >
             <MenuIcon />
@@ -108,7 +111,7 @@ export const Layout = ({ children, title }: ILayout) => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Menu open={open} toggleDrawer={toggleDrawer} />
+      <Menu open={openDrawer} toggleDrawer={toggleDrawer} />
       <Box display="flex" flexDirection="column" flexGrow={1}>
         <Box
           component="main"
@@ -121,7 +124,7 @@ export const Layout = ({ children, title }: ILayout) => {
         >
           <Toolbar />
           <Grid container justifyContent="center">
-            <Grid item container marginTop={2} className={open ? "main-open" : "main-close"}>
+            <Grid item container marginTop={2} className={openDrawer ? "main-open" : "main-close"}>
               {children}
             </Grid>
           </Grid>
