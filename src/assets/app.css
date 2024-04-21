@@ -1,0 +1,26 @@
+:root {
+  --header-height: 64px;
+  --footer-height: 16px;
+  --open-drawer-width: 240px;
+  --close-drawer-width: 72px;
+}
+html,
+body,
+#root {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.main-open {
+  max-width: calc(100vw - calc(var(--open-drawer-width) + 40px)) !important;
+}
+.main-close {
+  max-width: calc(100vw - calc(var(--close-drawer-width) + 40px)) !important;
+}
+.MuiAccordionSummary-content {
+  margin: 0 !important;
+}
+.MuiTableCell-root {
+  line-height: 0.5 !important;
+}
