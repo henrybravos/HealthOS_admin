@@ -110,7 +110,7 @@ export const Menu = ({ open, toggleDrawer }: IMenu) => {
         <ListItemText primary="Salir" />
       </ListItemButton>
       <Typography
-        style={{ backgroundColor: theme.palette.primary.main, color: theme.palette.secondary.main }}
+        style={{ backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary }}
         textAlign="center"
         fontSize={12}
       >
