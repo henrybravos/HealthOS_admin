@@ -6,7 +6,7 @@
 
 Some features in this application
 
-- [ ] Login with Firebase Authentication
+- [ x ] Login with Firebase Authentication
 - [ ] Add users with roles
   - reset password
   - disable user
