@@ -1,14 +1,6 @@
 import { COLLECTIONS } from "@core/config/collections"
 import { auth, db } from "@core/config/firebase-config"
-import {
-  Company,
-  EventType,
-  Occupation,
-  Place,
-  Racs,
-  UnsafeActCondition,
-  UserInfo
-} from "@core/types"
+import { Company, EventType, Occupation, Place, UnsafeActCondition, UserInfo } from "@core/types"
 import { signInWithEmailAndPassword, signOut } from "firebase/auth"
 import {
   DocumentData,
@@ -18,11 +10,16 @@ import {
   addDoc,
   collection,
   doc,
+  endBefore,
+  getCountFromServer,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   setDoc,
+  startAfter,
+  startAt,
   where
 } from "firebase/firestore"
 
@@ -70,12 +67,13 @@ const getDocumentById = async <T>(collectionName: string, uuid: string): Promise
     return null
   }
 }
+export type WhereQuery = { fieldPath: string | FieldPath; op: WhereFilterOp; value: unknown }
 const getDocumentsByQuery = async <T>(
   collectionName: string,
-  queries: { fieldPath: string | FieldPath; op: WhereFilterOp; value: unknown }[],
+  wheresArr: WhereQuery[],
   orderByField: string | undefined
 ): Promise<T[]> => {
-  const wheres = queries.map((q) => where(q.fieldPath, q.op, q.value))
+  const wheres = wheresArr.map((q) => where(q.fieldPath, q.op, q.value))
   let q = query(collection(db!, collectionName), ...wheres)
   if (orderByField) {
     q = query(collection(db!, collectionName), ...wheres, orderBy("createdAt", "desc"))
@@ -83,37 +81,58 @@ const getDocumentsByQuery = async <T>(
   const querySnapshot = await getDocs(q)
   return convertToEntity<T>(querySnapshot)
 }
+type DocumentsPagination = {
+  collectionName: string
+  whereFields: WhereQuery[]
+  orderField: string
+  pageSize: number
+  mode: "after" | "before" | "start"
+  documentId?: string
+}
+const getDocumentsPagination = async (params: DocumentsPagination) => {
+  if (!db) return
+  const collectionRef = collection(db, params.collectionName)
+  const limitRef = limit(params.pageSize)
+  const orderRef = orderBy(params.orderField, "desc")
+  let queryRef = query(collectionRef, orderRef, limitRef)
+
+  if (params.documentId && params.mode) {
+    const docSnap = await getDoc(doc(db, params.collectionName, params.documentId))
+    const init = {
+      after: startAfter(docSnap),
+      before: endBefore(docSnap),
+      start: startAt(docSnap)
+    }
+    queryRef = query(collectionRef, orderRef, init[params.mode], limitRef)
+  }
+  if (params.whereFields.length > 0) {
+    params.whereFields.forEach((w) => {
+      const whereRef = where(w.fieldPath, w.op, w.value)
+      queryRef = query(queryRef, whereRef)
+    })
+  }
+  const documentSnapshots = await getDocs(queryRef)
+  const data = documentSnapshots.docs.map((doc) => {
+    return {
+      id: doc.id,
+      ...doc.data()
+    }
+  })
+  const queryCount = query(collectionRef)
+  const snapshot = await getCountFromServer(queryCount)
+  const totalSize = snapshot.data().count
+  return { data, totalSize }
+}
+
 const EntityService = {
   getAllDocuments,
   getDocumentsByQuery,
   getDocumentById,
+  getDocumentsPagination,
   addDocument,
   setDocument
 }
-const RacsService = {
-  getRacsByUser: async (user: UserInfo) => {
-    if (!user || !user.id) {
-      throw new Error("User not found")
-    }
-    return EntityService.getDocumentsByQuery<Racs>(
-      COLLECTIONS.racs,
-      [
-        {
-          fieldPath: "user.id",
-          op: "==",
-          value: user.id
-        }
-      ],
-      "createdAt"
-    )
-  },
-  addDocument: async (data: Racs) => {
-    return EntityService.addDocument(COLLECTIONS.racs, data)
-  },
-  setDocument: async ({ data, uuid }: { data: Racs; uuid: string }) => {
-    return EntityService.setDocument(COLLECTIONS.racs, data, uuid)
-  }
-}
+
 const OccupationService = {
   getAllOccupations: async (): Promise<Occupation[]> => {
     return EntityService.getAllDocuments<Occupation>(COLLECTIONS.occupations)
@@ -169,6 +188,5 @@ export {
   ConditionService,
   PlaceService,
   EventTypeService,
-  RacsService,
   AuthService
 }

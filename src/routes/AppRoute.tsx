@@ -3,16 +3,16 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { Loading } from "@common/components"
 import { Layout } from "@common/components/layout"
 import { PATHS } from "@common/constants"
+import { useAppContext } from "@context/useAppContext"
 import LoginManagement from "@features/login/LoginManagement"
-import { useAuthentication } from "@hooks/index"
-import { Grid, LinearProgress, Typography } from "@mui/material"
+import { RacsListManagement } from "@features/racs/RacsListManagement"
 
 type PrivateRouterProps = {
   children: JSX.Element
   title: string
 }
 const PrivateRouter = ({ children, title }: PrivateRouterProps) => {
-  const { isAuthenticated, loadingAuth } = useAuthentication()
+  const { isAuthenticated, loadingAuth } = useAppContext()
   if (loadingAuth) {
     return <Loading />
   }
@@ -49,7 +49,7 @@ const AppRoute = () => {
         path={PATHS.RACS}
         element={
           <PrivateRouter title="RACS">
-            <h1>racs</h1>
+            <RacsListManagement />
           </PrivateRouter>
         }
       />

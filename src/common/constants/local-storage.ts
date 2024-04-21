@@ -1,4 +1,5 @@
 export const LOCAL_STORAGE = {
   USER: "LS_USER",
-  TOKEN: "LS_TOKEN"
+  TOKEN: "LS_TOKEN",
+  DRAWER_OPEN: "LS_DRAWER_OPEN"
 }
