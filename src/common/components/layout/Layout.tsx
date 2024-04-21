@@ -66,7 +66,7 @@ export const Layout = ({ children, title }: ILayout) => {
     localStorage.setItem("LS_DRAWER_OPEN", !open + "")
   }
   const {
-    palette: { secondary }
+    palette: { text }
   } = useTheme()
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export const Layout = ({ children, title }: ILayout) => {
         >
           <IconButton
             edge="start"
-            color="secondary"
+            color="inherit"
             aria-label="open drawer"
             onClick={toggleDrawer}
             sx={{
@@ -96,12 +96,12 @@ export const Layout = ({ children, title }: ILayout) => {
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }} />
 
           <IconButton color="inherit">
-            <Face color="secondary" />
+            <Face color="inherit" />
             <Box flexDirection={"column"} alignItems="flex-start" display="flex" paddingLeft={1}>
-              <Typography component="p" variant="body2" color={secondary.main} fontWeight="bold">
+              <Typography component="p" variant="body2" color={text.secondary} fontWeight="bold">
                 {userInfo?.name || ""} {userInfo?.surname || ""}
               </Typography>
-              <Typography component="p" variant="body2" color={secondary.main}>
+              <Typography component="p" variant="body2" color={text.secondary}>
                 {userInfo?.email || ""}
               </Typography>
             </Box>
