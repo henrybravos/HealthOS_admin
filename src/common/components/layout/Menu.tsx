@@ -1,12 +1,11 @@
 import { Fragment } from "react"
 import { Link, useLocation } from "react-router-dom"
 
-import { PATHS, VERSION_APP } from "@common/constants"
+import { PATHS } from "@common/constants"
 import { useAppContext } from "@context/useAppContext"
 import { ChevronLeft, Dashboard, Grading, Logout, People } from "@mui/icons-material"
-import { Divider, IconButton, List, Toolbar, Tooltip, Typography } from "@mui/material"
+import { Divider, IconButton, List, Toolbar, Tooltip } from "@mui/material"
 import { ListItemButton, ListItemIcon, ListItemText, Drawer as MuiDrawer } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
 import { styled } from "@mui/material/styles"
 
 import { drawerWidth } from "./Layout"
@@ -83,7 +82,6 @@ const Drawer = styled(MuiDrawer, {
   }
 }))
 export const Menu = ({ open, toggleDrawer }: IMenu) => {
-  const theme = useTheme()
   const { handleSignOut } = useAppContext()
   return (
     <Drawer variant="permanent" open={open} style={{ display: "flex", alignItems: "center" }}>
@@ -109,13 +107,6 @@ export const Menu = ({ open, toggleDrawer }: IMenu) => {
         </ListItemIcon>
         <ListItemText primary="Salir" />
       </ListItemButton>
-      <Typography
-        style={{ backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary }}
-        textAlign="center"
-        fontSize={12}
-      >
-        {VERSION_APP}
-      </Typography>
     </Drawer>
   )
 }
