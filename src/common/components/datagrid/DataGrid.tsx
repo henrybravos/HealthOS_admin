@@ -68,6 +68,10 @@ const DataGridComponent = (props: DataGridCustomProps) => {
   return (
     <DataGrid
       {...props}
+      style={{
+        ...props.style,
+        minHeight: "400px"
+      }}
       pagination
       density="compact"
       hideFooterSelectedRowCount
