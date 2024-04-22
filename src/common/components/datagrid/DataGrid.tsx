@@ -33,7 +33,7 @@ const initialModelPagination: PaginationModel = {
 }
 export type ModePagination = "after" | "before" | "start"
 type DataGridCustomProps = {
-  fetchServer: (params: { pageSize: number; mode: ModePagination; documentId?: string }) => void
+  fetchServer?: (params: { pageSize: number; mode: ModePagination; documentId?: string }) => void
   clearSelectRowCallback?: () => void
 } & DataGridProps
 const DataGridComponent = (props: DataGridCustomProps) => {
@@ -55,7 +55,7 @@ const DataGridComponent = (props: DataGridCustomProps) => {
       startAfterBeforeId = firstRow?.id
       mode = "before"
     }
-    props.fetchServer({
+    props.fetchServer?.({
       pageSize,
       mode,
       documentId: startAfterBeforeId
