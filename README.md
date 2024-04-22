@@ -7,12 +7,14 @@
 Some features in this application
 
 - [x] Login with Firebase Authentication
-- [ ] User list
-- [ ] Add users with roles
-  - [ ] reset password
+- [x] User list
+- [-] User admin
+  - [x] add/edit user
+  - [x] reset password
+  - [ ] protected with roles
   - [ ] disable user
 - [x] List RACS pagination
-  - [ ] Filter list
+  - [ ] Filter listS
 - [ ] Dashboard RACS
   - [ ] dates filters
   - [ ] download pdf
