@@ -15,7 +15,7 @@ const defaultTheme = createTheme({
       main: COLORS.SECONDARY
     },
     text: {
-      secondary: COLORS.SECONDARY,
+      secondary: COLORS.WHITE,
       primary: COLORS.PRIMARY
     }
   }
