@@ -12,6 +12,10 @@ export type User = {
   displayName: string
   auth: Auth
 }
+export enum UserRoleEnum {
+  ADMIN = "admin",
+  REGISTER = "register"
+}
 export type UserInfo = {
   id: string
   dni: string
@@ -22,4 +26,6 @@ export type UserInfo = {
   address: string
   createAt: Timestamp
   occupation: Occupation
+
+  roles: UserRoleEnum[]
 }

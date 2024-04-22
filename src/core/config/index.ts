@@ -1,2 +1,2 @@
-export * from './collections'
-export * from './firebase-config'
+export * from "./collections"
+export * from "./firebase-config"
