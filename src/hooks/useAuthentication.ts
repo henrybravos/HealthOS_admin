@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
+import { PATHS } from "@common/constants"
 import { auth } from "@core/config"
 import { AuthService } from "@core/services"
-import { UserInfo } from "@core/types"
+import { UserInfo, UserRoleEnum } from "@core/types"
 import { onAuthStateChanged } from "firebase/auth"
 
 export const useAuthentication = () => {
@@ -30,9 +31,13 @@ export const useAuthentication = () => {
   }
   const getDataExtra = async (id: string) => {
     const extra = await AuthService.getExtraData({ uuid: id })
+    const hasPermission = hasPermissions(extra?.roles || [])
+    console.log({ hasPermission })
     if (extra) {
       setUserInfo(extra)
-      navigate(pathname)
+      const isPathLogin = pathname.includes(PATHS.LOGIN)
+      const pathRedirect = isPathLogin ? PATHS.HOME : pathname
+      navigate(pathRedirect)
     } else {
       handleSignOut()
       setUserInfo(undefined)
@@ -40,6 +45,12 @@ export const useAuthentication = () => {
     setTimeout(() => {
       setLoadingAuth(false)
     }, 10)
+  }
+  const hasPermissions = (roles: UserRoleEnum[]) => {
+    if (userInfo) {
+      return roles.some((role) => role === UserRoleEnum.ADMIN)
+    }
+    return false
   }
   const handleSignOut = () => {
     AuthService.signOut()

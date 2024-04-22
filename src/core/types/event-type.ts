@@ -3,7 +3,7 @@ export type EventType = {
   name: string
 }
 export enum ClassificationEvent {
-  'HIGH' = 'ALTO',
-  'MEDIUM' = 'MEDIO',
-  'LOW' = 'BAJO',
+  "HIGH" = "ALTO",
+  "MEDIUM" = "MEDIO",
+  "LOW" = "BAJO"
 }
