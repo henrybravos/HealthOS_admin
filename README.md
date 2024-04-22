@@ -8,7 +8,7 @@ Some features in this application
 
 - [x] Login with Firebase Authentication
 - [x] User list
-- [-] User admin
+- [x] User admin
   - [x] add/edit user
   - [x] reset password
   - [ ] protected with roles
