@@ -20,7 +20,6 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1600,
-    outDir: "build",
     manifest: true,
     sourcemap: false,
     reportCompressedSize: true,
