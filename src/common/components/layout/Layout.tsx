@@ -24,8 +24,8 @@ export function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {"Copyright © development by "}
-      <Link color="inherit" href="https://urteaga.pe">
-        Urteaga
+      <Link color="inherit" href="#">
+        NOATUM
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
