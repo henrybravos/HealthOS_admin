@@ -18,7 +18,7 @@ Some features in this application
 - [ ] Dashboard RACS
   - [ ] dates filters
   - [ ] download pdf
-- [ ] Deploy vercel
+- [x] Deploy vercel
 
 ## Install and run
 
