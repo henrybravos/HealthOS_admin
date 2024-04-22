@@ -16,7 +16,7 @@ const initialFormAuth = {
 }
 export const useLogin = () => {
   const [formAuth, setFormAuth] = useState<typeof initialFormAuth>(initialFormAuth)
-  const [loadingAuth, authResponse, fetchAuth, errorAuth] = useFetchApi(AuthService.signIn)
+  const [loadingAuth, _, fetchAuth, errorAuth] = useFetchApi(AuthService.signIn)
 
   const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     const email = e.currentTarget.value

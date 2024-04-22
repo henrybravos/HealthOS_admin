@@ -1,7 +1,6 @@
 import { COLLECTIONS } from "@core/config"
 import { EntityService, WhereQuery } from "@core/services"
 import { Racs, UserInfo } from "@core/types"
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore"
 
 const RacsService = {
   getRacsByUser: async (user: UserInfo) => {
