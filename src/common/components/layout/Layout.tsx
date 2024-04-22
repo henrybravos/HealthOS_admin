@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-import { LOCAL_STORAGE } from "@common/constants"
+import { LOCAL_STORAGE, VERSION_APP } from "@common/constants"
 import { useAppContext } from "@context/useAppContext"
 import { Face, Menu as MenuIcon } from "@mui/icons-material"
 import {
@@ -22,13 +22,12 @@ import { Menu } from "./Menu"
 export const drawerWidth: number = 240
 export function Copyright(props: any) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {"Copyright © development by "}
+    <Typography variant="body2" color="inherit" align="center" {...props}>
+      {"Copyright © "}
       <Link color="inherit" href="#">
         NOATUM
       </Link>{" "}
       {new Date().getFullYear()}
-      {"."}
     </Typography>
   )
 }
@@ -101,10 +100,10 @@ export const Layout = ({ children, title }: ILayout) => {
           <IconButton color="inherit">
             <Face color="inherit" />
             <Box flexDirection={"column"} alignItems="flex-start" display="flex" paddingLeft={1}>
-              <Typography component="p" variant="body2" color={text.secondary} fontWeight="bold">
+              <Typography component="p" variant="body2" color={"inherit"} fontWeight="bold">
                 {userInfo?.name || ""} {userInfo?.surname || ""}
               </Typography>
-              <Typography component="p" variant="body2" color={text.secondary}>
+              <Typography component="p" variant="body2" color={"inherit"}>
                 {userInfo?.email || ""}
               </Typography>
             </Box>
@@ -130,15 +129,23 @@ export const Layout = ({ children, title }: ILayout) => {
           </Grid>
         </Box>
         <Box
+          flexDirection="row"
           sx={{
             backgroundColor: (theme) =>
               theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
             height: "3vh",
-            overflow: "auto"
+            overflow: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2
           }}
         >
           <Copyright />
+          <Typography textAlign="center" fontSize={12} color="inherit">
+            v.{VERSION_APP}
+          </Typography>
         </Box>
       </Box>
     </Box>
