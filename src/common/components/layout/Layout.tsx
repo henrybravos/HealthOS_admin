@@ -13,8 +13,7 @@ import {
   AppBarProps as MuiAppBarProps,
   Toolbar,
   Typography,
-  styled,
-  useTheme
+  styled
 } from "@mui/material"
 
 import { Menu } from "./Menu"
@@ -67,9 +66,6 @@ export const Layout = ({ children, title }: ILayout) => {
     setOpenDrawer(!openDrawer)
     localStorage.setItem(LOCAL_STORAGE.DRAWER_OPEN, !openDrawer + "")
   }
-  const {
-    palette: { text }
-  } = useTheme()
 
   useEffect(() => {
     document.title = title
