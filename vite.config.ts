@@ -17,5 +17,24 @@ export default defineConfig({
   },
   server: {
     host: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1600,
+    outDir: "build",
+    manifest: true,
+    sourcemap: false,
+    reportCompressedSize: true,
+    rollupOptions: {
+      output: {
+        entryFileNames: "js/[name].js",
+        chunkFileNames: "js/[name].js",
+        assetFileNames: "assets/[name].[ext]",
+        manualChunks(id) {
+          if (id.includes("src/constants/") || id.includes("src/utils/")) {
+            return "shared"
+          }
+        }
+      }
+    }
   }
 })
