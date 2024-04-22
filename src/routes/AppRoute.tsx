@@ -6,6 +6,7 @@ import { PATHS } from "@common/constants"
 import { useAppContext } from "@context/useAppContext"
 import LoginManagement from "@features/login/LoginManagement"
 import { RacsListManagement } from "@features/racs/RacsListManagement"
+import { UsersListManagement } from "@features/users"
 
 type PrivateRouterProps = {
   children: JSX.Element
@@ -57,7 +58,7 @@ const AppRoute = () => {
         path={PATHS.USERS}
         element={
           <PrivateRouter title="Usuarios">
-            <h1>users</h1>
+            <UsersListManagement />
           </PrivateRouter>
         }
       />

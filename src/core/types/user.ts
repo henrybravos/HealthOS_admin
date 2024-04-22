@@ -1,4 +1,5 @@
-import { Occupation } from '@core/types/occupations'
+import { Occupation } from "@core/types/occupations"
+import { Timestamp } from "firebase/firestore"
 
 export type Auth = {
   email: string
@@ -13,10 +14,12 @@ export type User = {
 }
 export type UserInfo = {
   id: string
+  dni: string
   name: string
   email: string
   surname: string
   phone: string
   address: string
+  createAt: Timestamp
   occupation: Occupation
 }

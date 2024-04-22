@@ -1,7 +1,6 @@
 import { COLLECTIONS } from "@core/config/collections"
-import { auth, db } from "@core/config/firebase-config"
-import { Company, EventType, Occupation, Place, UnsafeActCondition, UserInfo } from "@core/types"
-import { signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { db } from "@core/config/firebase-config"
+import { Company, EventType, Occupation, Place, UnsafeActCondition } from "@core/types"
 import {
   DocumentData,
   FieldPath,
@@ -164,22 +163,7 @@ const EventTypeService = {
     return EntityService.getAllDocuments<EventType>(COLLECTIONS.eventTypes)
   }
 }
-const AuthService = {
-  signIn: async ({ email, password }: { email: string; password: string }) => {
-    if (!auth) return
-    const responseAuth = await signInWithEmailAndPassword(auth, email, password)
-    return responseAuth
-  },
-  signOut: async () => {
-    if (!auth) return
-    await signOut(auth)
-    return true
-  },
-  getExtraData: async ({ uuid }: { uuid: string }) => {
-    const extra = await EntityService.getDocumentById<UserInfo>(COLLECTIONS.usersExtra, uuid)
-    return extra
-  }
-}
+
 export {
   EntityService,
   OccupationService,
@@ -187,6 +171,5 @@ export {
   ActService,
   ConditionService,
   PlaceService,
-  EventTypeService,
-  AuthService
+  EventTypeService
 }
