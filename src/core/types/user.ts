@@ -25,13 +25,16 @@ export enum UserCategoryEnum {
 }
 export type UserInfo = {
   id: string
+  authId?: string
   dni: string
   name: string
+  password?: string
   email: string
   surname: string
   phone: string
   address: string
-  createAt: Timestamp
+  createdAt: Timestamp
+  deletedAt: Timestamp
   occupation: Occupation
   category?: UserCategoryEnum
   racsGoals?: number

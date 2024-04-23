@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction } from "react"
 
 import { UserInfo, UserRoleEnum } from "@core/types"
-import { Visibility } from "@mui/icons-material"
-import { IconButton } from "@mui/material"
+import { PersonOff, Visibility } from "@mui/icons-material"
+import { IconButton, Tooltip } from "@mui/material"
 import { GridColDef } from "@mui/x-data-grid"
 
 export const initUserForm: Partial<UserInfo> = {
@@ -16,13 +16,15 @@ export const RolesSpanish = {
 export const initialStateUsersTable = {
   columns: {
     columnVisibilityModel: {
-      id: false
+      id: false,
+      deletedAt: false
     }
   }
 }
 export const getColumnsUsers: (
-  setUserInfoSelected: Dispatch<SetStateAction<UserInfo | undefined>>
-) => GridColDef<UserInfo>[] = (setUserInfoSelected) => {
+  setUserInfoSelected: Dispatch<SetStateAction<UserInfo | undefined>>,
+  setUserDeleted: Dispatch<SetStateAction<UserInfo | undefined>>
+) => GridColDef<UserInfo>[] = (setUserInfoSelected, setUserDeleted) => {
   return [
     {
       field: "id",
@@ -59,7 +61,7 @@ export const getColumnsUsers: (
     },
     {
       field: "occupation",
-      valueGetter: (occupation: UserInfo["occupation"]) => occupation.name || "--",
+      valueGetter: (occupation: UserInfo["occupation"]) => occupation?.name || "--",
       headerName: "Ocupación",
       width: 250
     },
@@ -81,17 +83,36 @@ export const getColumnsUsers: (
       width: 100
     },
     {
+      field: "deletedAt",
+      headerName: "Desactivado",
+      valueGetter: (deletedAt: UserInfo["deletedAt"]) => deletedAt?.toDate().toLocaleString(),
+      width: 100
+    },
+    {
       field: "_",
       headerName: "Opc.",
       renderCell: (params) => {
-        const onClickSeeEvidence = () => setUserInfoSelected(params.row)
+        const onClickEdit = () => setUserInfoSelected(params.row)
+        const onClickDelete = () => setUserDeleted(params.row)
+        const isDisabled = !!params.row.deletedAt
         return (
-          <IconButton size="small" onClick={onClickSeeEvidence}>
-            <Visibility fontSize="small" />
-          </IconButton>
+          <>
+            {!isDisabled && (
+              <Tooltip title="Editar/Restablecer contraseña">
+                <IconButton size="small" onClick={onClickEdit}>
+                  <Visibility fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Tooltip title={isDisabled ? "Activar usuario" : "Desactivar usuario"}>
+              <IconButton size="small" onClick={onClickDelete}>
+                <PersonOff color={isDisabled ? "info" : "action"} fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </>
         )
       },
-      width: 75
+      width: 100
     }
   ]
 }
