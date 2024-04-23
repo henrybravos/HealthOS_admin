@@ -11,9 +11,9 @@ Some features in this application
 - [x] User admin
   - [x] add/edit user
   - [x] reset password
-  - [X] protected with roles
+  - [x] protected with roles
   - [ ] disable user
-  - [ ] create/edit user category 
+  - [x] create/edit user category
   - [ ] create/edit user goal
 - [x] List RACS pagination
   - [ ] Filter listS

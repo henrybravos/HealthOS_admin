@@ -1,4 +1,4 @@
-import { UserRoleEnum } from "@core/types"
+import { UserCategoryEnum, UserRoleEnum } from "@core/types"
 import { useUserForm } from "@features/users/hooks/useUserForm"
 import { validateUserForm } from "@features/users/user.helpers"
 import { UserFormComponentParams } from "@features/users/user.types"
@@ -26,6 +26,7 @@ const UserFormComponent = (params: UserFormComponentParams) => {
     handleChangeOccupation,
     handleResetFetchPassword,
     handleResetCreateUpdate,
+    handleChangeCategory,
     handleResetPassword,
     handleChangeRole,
     handleChangeValueString,
@@ -41,7 +42,7 @@ const UserFormComponent = (params: UserFormComponentParams) => {
   } = useUserForm(params)
 
   return (
-    <Grid container component={Paper} flexDirection="column" padding={1} gap={1}>
+    <Grid container component={Paper} elevation={2} flexDirection="column" padding={1} gap={1}>
       {(isLoadingCreateUpdate || isLoadingReset) && <LinearProgress />}
       <Typography variant="h6" textAlign="center">
         {userForm?.id ? "Actualizar usuario" : "Crear usuario"}
@@ -116,6 +117,7 @@ const UserFormComponent = (params: UserFormComponentParams) => {
             type="password"
             error={!!errors.password}
             helperText={errors.password}
+            fullWidth
             InputProps={{
               endAdornment: userForm?.id && (
                 <Tooltip title="Enviar link de cambio de contraseña">
@@ -130,15 +132,34 @@ const UserFormComponent = (params: UserFormComponentParams) => {
         </Grid>
       </Grid>
       <Grid container gap={1}>
-        <TextField
-          onChange={handleChangeValueString("address")}
-          value={userForm?.address || " "}
-          label="Dirección"
-          size="small"
-          fullWidth
-          error={!!errors.address}
-          helperText={errors.address}
-        />
+        <Grid item flex={3}>
+          <TextField
+            onChange={handleChangeValueString("address")}
+            value={userForm?.address || " "}
+            label="Dirección"
+            size="small"
+            fullWidth
+            error={!!errors.address}
+            helperText={errors.address}
+          />
+        </Grid>
+        <Grid item flex={1}>
+          <FormControl error={!!errors.category} size="small" fullWidth>
+            <InputLabel id="category">Categoría</InputLabel>
+            <Select
+              value={userForm?.category || ""}
+              size="small"
+              labelId="category"
+              label="Categoría"
+            >
+              {Object.values(UserCategoryEnum).map((cat) => (
+                <MenuItem key={cat} value={cat} onClick={handleChangeCategory(cat)}>
+                  {cat}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
       <Grid container>
         <Grid item flex={1}>
