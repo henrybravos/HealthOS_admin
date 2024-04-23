@@ -41,6 +41,10 @@ if (!getApps().length) {
   auth = getAuth(app)
   db = getFirestore(app)
 }
-connectAuthEmulator(auth!, "http://localhost:9099")
-connectFirestoreEmulator(db!, "localhost", 8080)
+if (ENV.DEV) {
+  connectAuthEmulator(auth!, "http://localhost:9099")
+  connectFirestoreEmulator(db!, "localhost", 8080)
+} else {
+  console.log("Production mode")
+}
 export { app, auth, db, getApp, getAuth, getFirestore }
