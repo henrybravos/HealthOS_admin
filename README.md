@@ -11,7 +11,7 @@ Some features in this application
 - [x] User admin
   - [x] add/edit user
   - [x] reset password
-  - [ ] protected with roles
+  - [X] protected with roles
   - [ ] disable user
   - [ ] create/edit user category 
   - [ ] create/edit user goal
