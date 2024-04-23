@@ -5,8 +5,7 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut,
-  updateProfile
+  signOut
 } from "firebase/auth"
 import { Timestamp } from "firebase/firestore"
 
