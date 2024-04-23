@@ -1,14 +1,13 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useMemo, useState } from "react"
 
 import { useFetchApi } from "@common/hooks"
 import { AuthService, OccupationService } from "@core/services"
 import { Occupation, UserCategoryEnum, UserInfo, UserRoleEnum } from "@core/types"
 import { validateUserForm } from "@features/users/user.helpers"
-import { ErrorsUserForm, UserForm, UserFormComponentParams } from "@features/users/user.types"
+import { UserForm, UserFormComponentParams } from "@features/users/user.types"
 import { initUserForm } from "@features/users/users-list.const"
 
 const useUserForm = (params: UserFormComponentParams) => {
-  const [errors, setErrors] = useState<ErrorsUserForm>({})
   const [userForm, setUserForm] = useState<UserForm>(initUserForm)
   const [isLoadingOccupation, occupations, fetchOccupations] = useFetchApi(
     OccupationService.getAllOccupations
@@ -57,10 +56,8 @@ const useUserForm = (params: UserFormComponentParams) => {
       fetchCreateUpdate({
         email: userForm?.email ?? "",
         password: userForm.password ?? "",
-        user: userForm as UserInfo
+        user: { ...userForm, racsGoals: Number(userForm.racsGoals) || 0 } as UserInfo
       })
-    } else {
-      setErrors(errors.errors)
     }
   }
   const handleChangeValueString = (key: keyof UserForm) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +92,11 @@ const useUserForm = (params: UserFormComponentParams) => {
       })
     }
   }
+  const errorsForm = useMemo(() => {
+    const errors = validateUserForm(userForm)
+    return errors
+  }, [userForm])
+
   return {
     handleChangeOccupation,
     handleChangeRole,
@@ -105,13 +107,14 @@ const useUserForm = (params: UserFormComponentParams) => {
     handleResetCreateUpdate,
     handleChangeCategory,
 
+    isFormError: errorsForm.errors,
     isLoadingReset,
     isLoadingCreateUpdate,
     isLoadingOccupation,
     occupations,
     errorCreateUpdate,
     errorResetPassword,
-    errors,
+    errors: errorsForm.errors,
     userForm,
     responseResetPassword
   }
