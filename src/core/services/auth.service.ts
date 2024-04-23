@@ -1,12 +1,7 @@
 import { COLLECTIONS, auth } from "@core/config"
-import { EntityService } from "@core/services"
+import { EntityService, WhereQuery } from "@core/services"
 import { UserInfo } from "@core/types"
-import {
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut
-} from "firebase/auth"
+import { sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth"
 import { Timestamp } from "firebase/firestore"
 
 const AuthService = {
@@ -21,11 +16,23 @@ const AuthService = {
     return true
   },
   getAllUsers: async () => {
-    return await EntityService.getAllDocuments(COLLECTIONS.usersExtra, "createAt")
+    return await EntityService.getAllDocuments<UserInfo>(COLLECTIONS.usersExtra, "createdAt")
   },
-  getExtraData: async ({ uuid }: { uuid: string }) => {
-    const extra = await EntityService.getDocumentById<UserInfo>(COLLECTIONS.usersExtra, uuid)
-    return extra
+  getExtraData: async ({ authId }: { authId: string }) => {
+    const where: WhereQuery[] = [
+      {
+        fieldPath: "authId",
+        op: "==",
+        value: authId
+      }
+    ]
+    const extra = await EntityService.getDocumentsByQuery<UserInfo>(
+      COLLECTIONS.usersExtra,
+      where,
+      undefined
+    )
+    if (extra.length === 0) return null
+    return extra[0]
   },
   createOrUpdateUser: async ({
     email,
@@ -36,29 +43,26 @@ const AuthService = {
     password: string
     user: UserInfo
   }) => {
-    if (!auth) return
-    let id = user.id
-    if (!id) {
-      const credential = await createUserWithEmailAndPassword(auth, email, password)
-      id = credential.user.uid
-      user.createAt = Timestamp.fromDate(new Date())
+    if (!user.id) {
+      user.password = password // in functions remove password after create en auth
+      user.email = email
+      user.createdAt = Timestamp.fromDate(new Date())
+      return await EntityService.addDocument(COLLECTIONS.usersExtra, user)
     }
-    if (!id) return
-    return await EntityService.setDocument(COLLECTIONS.usersExtra, user, id)
+    const { id, ...restUser } = user
+    const response = await EntityService.setDocument(COLLECTIONS.usersExtra, restUser, id)
+    return { ...response, id }
   },
   sendPasswordResetEmail: async ({ email }: { email: string }) => {
     if (!auth) return
     await sendPasswordResetEmail(auth, email)
     return "enviendo correctamente"
   },
-  deleteUser: async ({ id }: { id: string }) => {
-    return await EntityService.setDocument(
-      COLLECTIONS.usersExtra,
-      {
-        deleteAt: Timestamp.fromDate(new Date())
-      },
-      id
-    )
+  activeOrDisabledUser: async ({ user }: { user: UserInfo }) => {
+    if (!user.id) return
+    const { id, deletedAt, ...restUser } = user
+    const userUpdate = deletedAt ? restUser : { ...restUser, deletedAt: Timestamp.now() }
+    return await EntityService.setDocument(COLLECTIONS.usersExtra, userUpdate, id)
   }
 }
 export { AuthService }

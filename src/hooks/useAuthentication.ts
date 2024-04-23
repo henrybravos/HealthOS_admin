@@ -29,10 +29,11 @@ export const useAuthentication = () => {
       })
     }
   }
-  const getDataExtra = async (id: string) => {
-    const extra = await AuthService.getExtraData({ uuid: id })
+  const getDataExtra = async (authId: string) => {
+    const extra = await AuthService.getExtraData({ authId })
+    const isActive = !extra?.deletedAt
     const hasPermission = hasPermissions(extra?.roles || [])
-    if (extra && hasPermission) {
+    if (extra && isActive && hasPermission) {
       setUserInfo(extra)
       const isPathLogin = pathname.includes(PATHS.LOGIN)
       const pathRedirect = isPathLogin ? PATHS.HOME : pathname
