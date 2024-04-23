@@ -46,10 +46,7 @@ export const useAuthentication = () => {
     }, 10)
   }
   const hasPermissions = (roles: UserRoleEnum[]) => {
-    if (userInfo) {
-      return roles.some((role) => role === UserRoleEnum.ADMIN)
-    }
-    return false
+    return !!roles?.some((role) => role === UserRoleEnum.ADMIN)
   }
   const handleSignOut = () => {
     AuthService.signOut()
