@@ -32,8 +32,7 @@ export const useAuthentication = () => {
   const getDataExtra = async (id: string) => {
     const extra = await AuthService.getExtraData({ uuid: id })
     const hasPermission = hasPermissions(extra?.roles || [])
-    console.log({ hasPermission })
-    if (extra) {
+    if (extra && hasPermission) {
       setUserInfo(extra)
       const isPathLogin = pathname.includes(PATHS.LOGIN)
       const pathRedirect = isPathLogin ? PATHS.HOME : pathname
