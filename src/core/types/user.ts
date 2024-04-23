@@ -13,6 +13,7 @@ export type User = {
   auth: Auth
 }
 export enum UserRoleEnum {
+  NONE = "",
   ADMIN = "admin",
   REGISTER = "register"
 }

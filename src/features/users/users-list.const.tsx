@@ -1,10 +1,25 @@
 import { Dispatch, SetStateAction } from "react"
 
-import { UserInfo } from "@core/types"
+import { UserInfo, UserRoleEnum } from "@core/types"
 import { Visibility } from "@mui/icons-material"
 import { IconButton } from "@mui/material"
 import { GridColDef } from "@mui/x-data-grid"
 
+export const initUserForm: Partial<UserInfo> = {
+  roles: [UserRoleEnum.REGISTER]
+}
+export const RolesSpanish = {
+  [UserRoleEnum.ADMIN]: "Administrador",
+  [UserRoleEnum.REGISTER]: "Registrador",
+  [UserRoleEnum.NONE]: "Ninguno"
+}
+export const initialStateUsersTable = {
+  columns: {
+    columnVisibilityModel: {
+      id: false
+    }
+  }
+}
 export const getColumnsUsers: (
   setUserInfoSelected: Dispatch<SetStateAction<UserInfo | undefined>>
 ) => GridColDef<UserInfo>[] = (setUserInfoSelected) => {
@@ -48,7 +63,13 @@ export const getColumnsUsers: (
       headerName: "Ocupación",
       width: 250
     },
-
+    {
+      field: "roles",
+      headerName: "Rol",
+      valueGetter: (roles: UserInfo["roles"]) =>
+        roles?.map((role) => RolesSpanish[role]).join(", "),
+      width: 250
+    },
     {
       field: "_",
       headerName: "Opciones",

@@ -49,9 +49,17 @@ const setDocument = async <T>(collectionName: string, data: T, uuid: string): Pr
     ...data
   }
 }
-const getAllDocuments = async <T>(collectionName: string): Promise<T[]> => {
-  const querySnapshot = await getDocs(collection(db!, collectionName))
-  return convertToEntity<T>(querySnapshot)
+const getAllDocuments = async <T>(collectionName: string, orderByField?: string): Promise<T[]> => {
+  if (!db) return []
+  if (!orderByField) {
+    const querySnapshot = await getDocs(collection(db!, collectionName))
+    return convertToEntity<T>(querySnapshot)
+  } else {
+    const querySnapshot = await getDocs(
+      query(collection(db!, collectionName), orderBy(orderByField, "desc"))
+    )
+    return convertToEntity<T>(querySnapshot)
+  }
 }
 const getDocumentById = async <T>(collectionName: string, uuid: string): Promise<T | null> => {
   const docRef = doc(db!, collectionName, uuid)

@@ -4,10 +4,10 @@ import { Datagrid } from "@common/components"
 import { useFetchApi } from "@common/hooks"
 import { AuthService } from "@core/services"
 import { UserInfo } from "@core/types"
-import UserForm from "@features/users/UserForm"
 import { Button, Grid, Paper } from "@mui/material"
 
-import { getColumnsUsers } from "./users-list.const"
+import UserFormComponent from "./UserFormComponent"
+import { getColumnsUsers, initUserForm, initialStateUsersTable } from "./users-list.const"
 
 const UserListManagement = () => {
   const [userSelected, setUserSelected] = useState<UserInfo>()
@@ -24,8 +24,11 @@ const UserListManagement = () => {
     if (userSelected) {
       handleCloseCreateOrUpdate()
     } else {
-      setUserSelected({} as UserInfo)
+      setUserSelected(initUserForm as UserInfo)
     }
+  }
+  const styleDisplayForm = {
+    display: userSelected ? "block" : "none"
   }
   return (
     <Grid container>
@@ -41,25 +44,12 @@ const UserListManagement = () => {
             columns={getColumnsUsers(setUserSelected)}
             disableRowSelectionOnClick
             rows={users ?? []}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  id: false
-                }
-              }
-            }}
+            initialState={initialStateUsersTable}
           />
         </Grid>
       </Grid>
-      <Grid
-        item
-        md={userSelected ? 4 : 0}
-        padding={1}
-        style={{
-          display: userSelected ? "block" : "none"
-        }}
-      >
-        <UserForm
+      <Grid item md={userSelected ? 4 : 0} padding={1} style={styleDisplayForm}>
+        <UserFormComponent
           fetchUsers={fetchUsers}
           handleCloseForm={handleCloseCreateOrUpdate}
           userEdit={userSelected}
