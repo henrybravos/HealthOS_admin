@@ -20,19 +20,19 @@ export interface IDialogComponent extends Omit<DialogProps, "ref"> {
   agreeText?: string
   disagreeText?: string
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>
-  handleCloseDialog?: () => void
-  onAgreeDialog?: () => void
   loadingAgreeButton?: boolean
   setLoadingAgreeButton?: React.Dispatch<React.SetStateAction<boolean>>
   disableAgreeButton?: boolean
   disableActions?: boolean
+  handleCloseDialog?: () => void
+  handleAgreeDialog?: () => void
 }
 
 const DialogComponent = (props: IDialogComponent) => {
   const {
     title,
     setOpen,
-    onAgreeDialog,
+    handleAgreeDialog,
     disagreeText = "Cancelar",
     agreeText = "Aceptar",
     loadingAgreeButton: loadingAgreeButton,
@@ -83,7 +83,7 @@ const DialogComponent = (props: IDialogComponent) => {
             </Button>
             <Button
               variant="contained"
-              onClick={onAgreeDialog}
+              onClick={handleAgreeDialog ?? handleClose}
               autoFocus
               color="primary"
               disabled={disableAgreeButton}
