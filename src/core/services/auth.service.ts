@@ -41,9 +41,9 @@ const AuthService = {
     if (!id) {
       const credential = await createUserWithEmailAndPassword(auth, email, password)
       id = credential.user.uid
+      user.createAt = Timestamp.fromDate(new Date())
     }
     if (!id) return
-    user.createAt = Timestamp.fromDate(new Date())
     return await EntityService.setDocument(COLLECTIONS.usersExtra, user, id)
   },
   sendPasswordResetEmail: async ({ email }: { email: string }) => {
