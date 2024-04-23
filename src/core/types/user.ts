@@ -17,6 +17,12 @@ export enum UserRoleEnum {
   ADMIN = "admin",
   REGISTER = "register"
 }
+export enum UserCategoryEnum {
+  NONE = "",
+  N1 = "N1",
+  N2 = "N2",
+  N3 = "N3"
+}
 export type UserInfo = {
   id: string
   dni: string
@@ -27,6 +33,6 @@ export type UserInfo = {
   address: string
   createAt: Timestamp
   occupation: Occupation
-
+  category?: UserCategoryEnum
   roles: UserRoleEnum[]
 }

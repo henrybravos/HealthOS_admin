@@ -64,6 +64,11 @@ export const getColumnsUsers: (
       width: 250
     },
     {
+      field: "category",
+      headerName: "Categoria",
+      width: 100
+    },
+    {
       field: "roles",
       headerName: "Rol",
       valueGetter: (roles: UserInfo["roles"]) =>
@@ -72,7 +77,7 @@ export const getColumnsUsers: (
     },
     {
       field: "_",
-      headerName: "Opciones",
+      headerName: "Opc.",
       renderCell: (params) => {
         const onClickSeeEvidence = () => setUserInfoSelected(params.row)
         return (
@@ -81,7 +86,7 @@ export const getColumnsUsers: (
           </IconButton>
         )
       },
-      width: 150
+      width: 75
     }
   ]
 }

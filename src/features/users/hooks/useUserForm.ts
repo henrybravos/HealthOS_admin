@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react"
 
 import { useFetchApi } from "@common/hooks"
 import { AuthService, OccupationService } from "@core/services"
-import { Occupation, UserInfo, UserRoleEnum } from "@core/types"
+import { Occupation, UserCategoryEnum, UserInfo, UserRoleEnum } from "@core/types"
 import { validateUserForm } from "@features/users/user.helpers"
 import { ErrorsUserForm, UserForm, UserFormComponentParams } from "@features/users/user.types"
 import { initUserForm } from "@features/users/users-list.const"
@@ -76,6 +76,12 @@ const useUserForm = (params: UserFormComponentParams) => {
       roles: [role]
     })
   }
+  const handleChangeCategory = (category: UserCategoryEnum) => () => {
+    setUserForm({
+      ...userForm,
+      category
+    })
+  }
   const handleChangeOccupation = (occupation: Occupation) => () => {
     setUserForm({
       ...userForm,
@@ -97,6 +103,7 @@ const useUserForm = (params: UserFormComponentParams) => {
     handleCreateOrUpdate,
     handleResetFetchPassword,
     handleResetCreateUpdate,
+    handleChangeCategory,
 
     isLoadingReset,
     isLoadingCreateUpdate,
