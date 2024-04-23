@@ -12,9 +12,9 @@ Some features in this application
   - [x] add/edit user
   - [x] reset password
   - [x] protected with roles
-  - [ ] disable user
   - [x] create/edit user category
-  - [ ] create/edit user goal
+  - [x] create/edit user goal
+  - [ ] disable user
 - [x] List RACS pagination
   - [ ] Filter listS
 - [ ] Dashboard RACS

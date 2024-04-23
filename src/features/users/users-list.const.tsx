@@ -69,11 +69,16 @@ export const getColumnsUsers: (
       width: 100
     },
     {
+      field: "racsGoals",
+      headerName: "Racs",
+      width: 100
+    },
+    {
       field: "roles",
       headerName: "Rol",
       valueGetter: (roles: UserInfo["roles"]) =>
         roles?.map((role) => RolesSpanish[role]).join(", "),
-      width: 250
+      width: 100
     },
     {
       field: "_",

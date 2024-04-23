@@ -94,6 +94,15 @@ const UserFormComponent = (params: UserFormComponentParams) => {
             helperText={errors.phone}
           />
         </Grid>
+        <Grid item flex={1}>
+          <TextField
+            onChange={handleChangeValueString("racsGoals")}
+            value={userForm?.racsGoals || " "}
+            label="RACS Meta"
+            size="small"
+            fullWidth
+          />
+        </Grid>
       </Grid>
       <Grid container gap={1}>
         <Grid item flex={1}>

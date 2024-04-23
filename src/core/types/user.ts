@@ -34,5 +34,6 @@ export type UserInfo = {
   createAt: Timestamp
   occupation: Occupation
   category?: UserCategoryEnum
+  racsGoals?: number
   roles: UserRoleEnum[]
 }
