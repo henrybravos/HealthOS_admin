@@ -1,8 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react"
-
-import { useFetchApi } from "@common/hooks"
-import { AuthService, OccupationService } from "@core/services"
-import { Occupation, UserInfo } from "@core/types"
+import { UserRoleEnum } from "@core/types"
+import { useUserForm } from "@features/users/hooks/useUserForm"
+import { validateUserForm } from "@features/users/user.helpers"
+import { UserFormComponentParams } from "@features/users/user.types"
+import { RolesSpanish } from "@features/users/users-list.const"
 import { Email } from "@mui/icons-material"
 import {
   Alert,
@@ -20,90 +20,26 @@ import {
   Typography
 } from "@mui/material"
 
-type UserFormParams = {
-  userEdit?: UserInfo
-  fetchUsers: () => void
-  handleCloseForm: () => void
-}
-
-const UserForm = (params: UserFormParams) => {
-  const [password, setPassword] = useState("")
-  const [userForm, setUserForm] = useState<Partial<UserInfo>>()
-  const [isLoadingOccupation, occupations, fetchOccupations] = useFetchApi(
-    OccupationService.getAllOccupations
-  )
-  const [isLoadingReset, responseResetPassword, fetchReset, errorReset, resetFetchPassword] =
-    useFetchApi(AuthService.sendPasswordResetEmail)
-  const [
+const UserFormComponent = (params: UserFormComponentParams) => {
+  const {
+    errors,
+    handleChangeOccupation,
+    handleResetFetchPassword,
+    handleResetCreateUpdate,
+    handleResetPassword,
+    handleChangeRole,
+    handleChangeValueString,
+    handleCreateOrUpdate,
     isLoadingCreateUpdate,
-    createUpdateResponse,
-    fetchCreateUpdate,
+    isLoadingReset,
+    isLoadingOccupation,
+    occupations,
+    userForm,
+    responseResetPassword,
     errorCreateUpdate,
-    resetCreateUpdate
-  ] = useFetchApi(AuthService.createOrUpdateUser)
-  useEffect(() => {
-    fetchOccupations()
-  }, [])
-  useEffect(() => {
-    if (!isLoadingReset) {
-      setTimeout(() => {
-        resetFetchPassword()
-      }, 1000)
-    }
-  }, [isLoadingReset])
-  useEffect(() => {
-    if (params.userEdit) {
-      setUserForm({ ...params.userEdit })
-    }
-  }, [params.userEdit])
-  useEffect(() => {
-    if (createUpdateResponse?.id) {
-      params.fetchUsers()
-      params.handleCloseForm()
-      setUserForm({})
-    }
-  }, [createUpdateResponse])
-  const validateForm = () => {
-    if (!userForm?.id && password.length < 5) return false
-    if (!userForm?.name) return false
-    if (!userForm?.surname) return false
-    if (!userForm?.email) return false
-    if (!userForm?.occupation || !userForm.occupation.id) return false
-    return true
-  }
-  const handleCreateOrUpdate = () => {
-    if (validateForm()) {
-      resetCreateUpdate()
-      fetchCreateUpdate({
-        email: userForm?.email ?? "",
-        password: password,
-        user: userForm as UserInfo
-      })
-    }
-  }
-  const handleChangeValueString = (key: keyof UserInfo) => (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value || ""
-    setUserForm({
-      ...userForm,
-      [key]: value.trim()
-    })
-  }
-  const handleChangeOccupation = (occupation: Occupation) => () => {
-    setUserForm({
-      ...userForm,
-      occupation
-    })
-  }
-  const handleChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value)
-  }
-  const resetPassword = () => {
-    if (userForm?.email) {
-      fetchReset({
-        email: userForm.email
-      })
-    }
-  }
+    errorResetPassword
+  } = useUserForm(params)
+
   return (
     <Grid container component={Paper} flexDirection="column" padding={1} gap={1}>
       {(isLoadingCreateUpdate || isLoadingReset) && <LinearProgress />}
@@ -118,6 +54,8 @@ const UserForm = (params: UserFormParams) => {
             label="Nombres"
             size="small"
             fullWidth
+            error={!!errors.name}
+            helperText={errors.name}
           />
         </Grid>
         <Grid item flex={1}>
@@ -127,6 +65,8 @@ const UserForm = (params: UserFormParams) => {
             label="Apellidos"
             size="small"
             fullWidth
+            error={!!errors.surname}
+            helperText={errors.surname}
           />
         </Grid>
       </Grid>
@@ -138,6 +78,8 @@ const UserForm = (params: UserFormParams) => {
             label="DNI"
             size="small"
             fullWidth
+            error={!!errors.dni}
+            helperText={errors.dni}
           />
         </Grid>
         <Grid item flex={1}>
@@ -147,6 +89,8 @@ const UserForm = (params: UserFormParams) => {
             label="Teléfono"
             size="small"
             fullWidth
+            error={!!errors.phone}
+            helperText={errors.phone}
           />
         </Grid>
       </Grid>
@@ -159,19 +103,23 @@ const UserForm = (params: UserFormParams) => {
             disabled={!!userForm?.id}
             size="small"
             fullWidth
+            error={!!errors.email}
+            helperText={errors.email}
           />
         </Grid>
         <Grid container flexDirection="row" item flex={1}>
           <TextField
-            value={userForm?.id ? "-----" : password}
-            onChange={handleChangePassword}
+            value={userForm?.id ? "-----" : userForm.password || ""}
+            onChange={handleChangeValueString("password")}
             label="Contraseña"
             size="small"
             type="password"
+            error={!!errors.password}
+            helperText={errors.password}
             InputProps={{
               endAdornment: userForm?.id && (
                 <Tooltip title="Enviar link de cambio de contraseña">
-                  <IconButton size="small" onClick={resetPassword}>
+                  <IconButton size="small" onClick={handleResetPassword}>
                     <Email fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -188,11 +136,13 @@ const UserForm = (params: UserFormParams) => {
           label="Dirección"
           size="small"
           fullWidth
+          error={!!errors.address}
+          helperText={errors.address}
         />
       </Grid>
       <Grid container>
         <Grid item flex={1}>
-          <FormControl size="small" fullWidth>
+          <FormControl size="small" fullWidth error={!!errors.occupation}>
             <InputLabel id="occupation">Ocupación</InputLabel>
             <Select
               value={userForm?.occupation?.id || ""}
@@ -210,31 +160,52 @@ const UserForm = (params: UserFormParams) => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item flex={1}>
+          <FormControl error={!!errors.roles} size="small" fullWidth>
+            <InputLabel id="rol">Rol</InputLabel>
+            <Select value={userForm?.roles?.[0] || ""} size="small" labelId="rol" label="Rol">
+              {Object.values(UserRoleEnum).map((role) => (
+                <MenuItem key={role} value={role} onClick={handleChangeRole(role)}>
+                  {RolesSpanish[role]}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
       <Button
         onClick={handleCreateOrUpdate}
         size="small"
-        disabled={isLoadingCreateUpdate || !validateForm()}
+        disabled={isLoadingCreateUpdate || !validateUserForm(userForm).isValid}
         variant="contained"
         color="primary"
       >
         Guardar
       </Button>
-      {(errorCreateUpdate || errorReset) && (
-        <Alert variant="outlined" color="error" onClose={resetCreateUpdate}>
+      {errorCreateUpdate && (
+        <Alert variant="outlined" color="error" onClose={handleResetCreateUpdate}>
           <Typography>
             Hubo un error, code:
             {errorCreateUpdate?.replace("Firebase:", "")}
-            {errorReset?.replace("Firebase:", "")}
+            {errorResetPassword?.replace("Firebase:", "")}
+          </Typography>
+        </Alert>
+      )}
+      {(errorCreateUpdate || errorResetPassword) && (
+        <Alert variant="outlined" color="error" onClose={handleCreateOrUpdate}>
+          <Typography>
+            Hubo un error, code:
+            {errorCreateUpdate?.replace("Firebase:", "")}
+            {errorResetPassword?.replace("Firebase:", "")}
           </Typography>
         </Alert>
       )}
       {responseResetPassword && (
-        <Alert variant="outlined" color="info" onClose={resetFetchPassword}>
+        <Alert variant="outlined" color="info" onClose={handleResetFetchPassword}>
           <Typography>Enviando correctmante</Typography>
         </Alert>
       )}
     </Grid>
   )
 }
-export default UserForm
+export default UserFormComponent

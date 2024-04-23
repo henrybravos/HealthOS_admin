@@ -21,7 +21,7 @@ const AuthService = {
     return true
   },
   getAllUsers: async () => {
-    return await EntityService.getAllDocuments(COLLECTIONS.usersExtra)
+    return await EntityService.getAllDocuments(COLLECTIONS.usersExtra, "createAt")
   },
   getExtraData: async ({ uuid }: { uuid: string }) => {
     const extra = await EntityService.getDocumentById<UserInfo>(COLLECTIONS.usersExtra, uuid)
