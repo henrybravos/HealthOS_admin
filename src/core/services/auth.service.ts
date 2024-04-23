@@ -5,7 +5,8 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  updateProfile
 } from "firebase/auth"
 import { Timestamp } from "firebase/firestore"
 
@@ -50,6 +51,15 @@ const AuthService = {
     if (!auth) return
     await sendPasswordResetEmail(auth, email)
     return "enviendo correctamente"
+  },
+  deleteUser: async ({ id }: { id: string }) => {
+    return await EntityService.setDocument(
+      COLLECTIONS.usersExtra,
+      {
+        deleteAt: Timestamp.fromDate(new Date())
+      },
+      id
+    )
   }
 }
 export { AuthService }

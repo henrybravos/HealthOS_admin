@@ -1,6 +1,17 @@
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app"
-import { Auth, browserLocalPersistence, getAuth, initializeAuth } from "firebase/auth"
-import { Firestore, getFirestore, initializeFirestore } from "firebase/firestore"
+import {
+  Auth,
+  browserLocalPersistence,
+  connectAuthEmulator,
+  getAuth,
+  initializeAuth
+} from "firebase/auth"
+import {
+  Firestore,
+  connectFirestoreEmulator,
+  getFirestore,
+  initializeFirestore
+} from "firebase/firestore"
 
 const ENV = import.meta.env
 const firebaseConfig = {
@@ -30,4 +41,11 @@ if (!getApps().length) {
   auth = getAuth(app)
   db = getFirestore(app)
 }
+if (ENV.DEV) {
+  connectAuthEmulator(auth!, "http://localhost:9099")
+  connectFirestoreEmulator(db!, "localhost", 8080)
+} else {
+  console.log("Production mode")
+}
+
 export { app, auth, db, getApp, getAuth, getFirestore }
