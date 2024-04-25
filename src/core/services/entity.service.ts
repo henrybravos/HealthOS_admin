@@ -22,7 +22,9 @@ import {
   where
 } from "firebase/firestore"
 
-const convertToEntity = <T>(querySnapshot: QuerySnapshot<DocumentData, DocumentData>): T[] => {
+export const convertToEntity = <T>(
+  querySnapshot: QuerySnapshot<DocumentData, DocumentData>
+): T[] => {
   const documents: T[] = []
   querySnapshot.forEach((doc) => {
     const row = doc.data()

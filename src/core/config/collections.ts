@@ -1,5 +1,6 @@
 export const COLLECTIONS = {
   companies: "companies",
+  reports: "reports",
   usersExtra: "users_info",
   eventTypes: "event_types",
   occupations: "occupations",

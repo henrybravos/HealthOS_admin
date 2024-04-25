@@ -34,7 +34,7 @@ export type UserInfo = {
   phone: string
   address: string
   createdAt: Timestamp
-  deletedAt: Timestamp
+  deletedAt?: Timestamp
   occupation: Occupation
   category?: UserCategoryEnum
   racsGoals?: number
