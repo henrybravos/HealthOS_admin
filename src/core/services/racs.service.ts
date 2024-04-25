@@ -1,6 +1,9 @@
 import { COLLECTIONS } from "@core/config"
-import { EntityService, WhereQuery } from "@core/services"
+import { db } from "@core/config/firebase-config"
+import { EntityService, WhereQuery, convertToEntity } from "@core/services"
 import { Racs, UserInfo } from "@core/types"
+import { RacsUser } from "@features/home"
+import { collection, getDocs } from "firebase/firestore"
 
 const RacsService = {
   getRacsByUser: async (user: UserInfo) => {
@@ -39,6 +42,24 @@ const RacsService = {
       mode,
       documentId
     })
+  },
+  getReportByMonth: async (months: string[]) => {
+    if (!db) return
+    const promises = months.map(async (month) => {
+      const docsRef = await getDocs(collection(db!, COLLECTIONS.reports, COLLECTIONS.racs, month))
+      const userRacsMonth = convertToEntity<RacsUser>(docsRef)
+      return {
+        month,
+        userRacsMonth
+      }
+    })
+    try {
+      const result = await Promise.all(promises)
+      return result.flat()
+    } catch (error) {
+      console.error("Error al obtener los documentos:", error)
+      throw error
+    }
   }
 }
 export { RacsService }

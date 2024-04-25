@@ -35,6 +35,7 @@ export type ModePagination = "after" | "before" | "start"
 type DataGridCustomProps = {
   fetchServer?: (params: { pageSize: number; mode: ModePagination; documentId?: string }) => void
   clearSelectRowCallback?: () => void
+  disableExport?: boolean
 } & DataGridProps
 const DataGridComponent = (props: DataGridCustomProps) => {
   const [paginationModel, setPaginationModel] = useState(initialModelPagination)
@@ -80,7 +81,7 @@ const DataGridComponent = (props: DataGridCustomProps) => {
       pageSizeOptions={PAGE_SIZE_OPTIONS}
       localeText={LOCALE_TEXT_DATA_GRID}
       onPaginationModelChange={handlePageChange}
-      slots={{ toolbar: ExportCsv }}
+      slots={{ toolbar: !props.disableExport ? ExportCsv : undefined }}
       onRowSelectionModelChange={ifNotSelectThenRemove}
       initialState={{ ...props.initialState, ...INITIAL_STATE_DATAGRID }}
     />

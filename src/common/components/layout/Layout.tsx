@@ -114,7 +114,7 @@ export const Layout = ({ children, title }: ILayout) => {
             backgroundColor: (theme) =>
               theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900],
             flexGrow: 1,
-            minHeight: "95vh"
+            height: "100%"
           }}
         >
           <Toolbar />

@@ -4,6 +4,7 @@ import { Loading } from "@common/components"
 import { Layout } from "@common/components/layout"
 import { PATHS } from "@common/constants"
 import { useAppContext } from "@context/useAppContext"
+import HomeManagement from "@features/home/HomeManagement"
 import LoginManagement from "@features/login/LoginManagement"
 import { RacsListManagement } from "@features/racs/RacsListManagement"
 import { UsersListManagement } from "@features/users"
@@ -42,7 +43,7 @@ const AppRoute = () => {
         path={PATHS.HOME}
         element={
           <PrivateRouter title="Home">
-            <h1>home</h1>
+            <HomeManagement />
           </PrivateRouter>
         }
       />
