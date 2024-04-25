@@ -1,10 +1,12 @@
+import { getMonthsBetweenDates } from "@common/helpers"
 import { COLLECTIONS } from "@core/config"
 import { db } from "@core/config/firebase-config"
-import { EntityService, WhereQuery, convertToEntity } from "@core/services"
-import { Racs, UserInfo } from "@core/types"
-import { RacsUser } from "@features/home"
-import { collection, getDocs } from "firebase/firestore"
+import { EntityService, WhereQuery } from "@core/services"
+import { MonthYear, Racs, UserInfo } from "@core/types"
+import dayjs from "dayjs"
+import { Timestamp } from "firebase/firestore"
 
+type RacsBetweenParams = { dateStart: dayjs.Dayjs; dateEnd: dayjs.Dayjs }
 const RacsService = {
   getRacsByUser: async (user: UserInfo) => {
     if (!user || !user.id) {
@@ -43,23 +45,40 @@ const RacsService = {
       documentId
     })
   },
-  getReportByMonth: async (months: string[]) => {
-    if (!db) return
-    const promises = months.map(async (month) => {
-      const docsRef = await getDocs(collection(db!, COLLECTIONS.reports, COLLECTIONS.racs, month))
-      const userRacsMonth = convertToEntity<RacsUser>(docsRef)
-      return {
-        month,
-        userRacsMonth
+  getRacsBetweenDates: async ({ dateStart, dateEnd }: RacsBetweenParams) => {
+    if (!db) return {}
+    const months = getMonthsBetweenDates(dateStart, dateEnd)
+    if (months.length === 0) return {}
+    const startDay = dateStart.startOf("day")
+    const endDateDay = dateEnd.endOf("day")
+    const wheres: WhereQuery[] = [
+      {
+        fieldPath: "openAt",
+        op: ">=",
+        value: Timestamp.fromDate(startDay.toDate())
+      },
+      {
+        fieldPath: "createdAt",
+        op: "<=",
+        value: Timestamp.fromDate(endDateDay.toDate())
+      }
+    ]
+    const racs = await EntityService.getDocumentsByQuery<Racs>(
+      COLLECTIONS.racs,
+      wheres,
+      "createdAt"
+    )
+
+    const racsUser: Record<MonthYear, Racs[]> = {}
+    racs.forEach((rac) => {
+      const monthYear = dayjs(rac.openAt.toDate()).format("YYYY-MM") as MonthYear
+      if (!racsUser[monthYear]) {
+        racsUser[monthYear] = [rac]
+      } else {
+        racsUser[monthYear].push(rac)
       }
     })
-    try {
-      const result = await Promise.all(promises)
-      return result.flat()
-    } catch (error) {
-      console.error("Error al obtener los documentos:", error)
-      throw error
-    }
+    return racsUser
   }
 }
 export { RacsService }

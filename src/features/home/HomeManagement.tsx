@@ -1,9 +1,10 @@
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
 
+import { getMonthsBetweenDates } from "@common/helpers"
 import { useFetchApi } from "@common/hooks"
 import { AuthService, RacsService } from "@core/services"
-import { UserInfo } from "@core/types"
+import { MonthYear, RacsUser, RacsUserReport, UserInfo } from "@core/types"
 import {
   Button,
   Grid,
@@ -22,20 +23,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import dayjs from "dayjs"
 import { toPng } from "html-to-image"
 
-type MonthYear = string
-
-export type RacsUser = {
-  month: string
-  userId: string
-  racsIds: string[]
-  racsGoal: number
-  racsQuantity: number
-}
-
-type RacsUserReport = {
-  user: UserInfo
-  months: Record<MonthYear, RacsUser>
-}
 const getColorPercentage = (percentage: number) => {
   if (percentage >= 67) {
     return "#4caf50"
@@ -55,16 +42,6 @@ const getPercentage = (racsQuantity?: number, goal?: number) => {
   return percentage || 0
 }
 
-const getMonthsBetweenDates = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {
-  const months = []
-  let currentDate = startDate.add(1, "month")
-  while (currentDate.isBefore(endDate)) {
-    months.push(currentDate.format("YYYY-MM"))
-    currentDate = currentDate.add(1, "month")
-  }
-  months.push(endDate.format("YYYY-MM"))
-  return months
-}
 const TableHeaderRacs = ({ months }: { months: string[] }) => {
   return (
     <TableHead style={{ background: "#bbe5df38" }}>
@@ -96,20 +73,20 @@ const TableHeaderRacs = ({ months }: { months: string[] }) => {
   )
 }
 type HomeManagementProps = {
-  startDate: dayjs.Dayjs
-  endDate: dayjs.Dayjs
+  dateStart: dayjs.Dayjs
+  dateEnd: dayjs.Dayjs
   months: string[]
   containerRef: React.RefObject<HTMLDivElement>
   divReportRef: React.RefObject<HTMLDivElement>
-  setStartDate: (date: dayjs.Dayjs) => void
-  setEndDate: (date: dayjs.Dayjs) => void
+  setDateStart: (date: dayjs.Dayjs) => void
+  setDateEnd: (date: dayjs.Dayjs) => void
   fetchRacsUser: (months: string[]) => void
 }
 const HeaderHome = ({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
+  dateStart,
+  setDateStart,
+  dateEnd,
+  setDateEnd,
   fetchRacsUser,
   months,
   divReportRef,
@@ -149,23 +126,23 @@ const HeaderHome = ({
           slotProps={{
             textField: { size: "small" }
           }}
-          value={startDate}
-          onChange={(date) => date && setStartDate(date)}
+          value={dateStart}
+          onChange={(date) => date && setDateStart(date)}
           label={"Desde >="}
-          views={["month", "year"]}
+          views={["day", "month", "year"]}
         />
         <DatePicker
           slotProps={{
             textField: { size: "small" }
           }}
-          value={endDate}
-          onChange={(date) => date && setEndDate(date)}
+          value={dateEnd}
+          onChange={(date) => date && setDateEnd(date)}
           label={"Hasta <"}
-          views={["month", "year"]}
+          views={["day", "month", "year"]}
         />
       </LocalizationProvider>
       <Button
-        disabled={!startDate || !endDate}
+        disabled={!dateStart || !dateEnd}
         color="info"
         variant="outlined"
         size="small"
@@ -257,37 +234,34 @@ const HomeManagement = () => {
   const currentDate = dayjs()
   const lastYearDate = currentDate.subtract(1, "year")
   const elementContainerRef = useRef<HTMLDivElement>(null)
-  const [startDate, setStartDate] = useState(lastYearDate)
-  const [endDate, setEndDate] = useState(currentDate)
+  const [dateStart, setDateStart] = useState(lastYearDate)
+  const [dateEnd, setDateEnd] = useState(currentDate)
   const [isLoadingUser, users, fetchUsers] = useFetchApi(AuthService.getAllUsers)
-  const [isLoadingRacs, racsReport, fetchRacsUser] = useFetchApi(RacsService.getReportByMonth)
-
-  const monthsFilter = useMemo(
-    () => getMonthsBetweenDates(startDate, endDate),
-    [startDate, endDate]
+  const [monthsFilter, setMonthsFilter] = useState<string[]>(
+    getMonthsBetweenDates(dateStart, dateEnd)
   )
+  const [isLoadingRacs, racsReport, fetchRacsUser] = useFetchApi(RacsService.getRacsBetweenDates)
+
   useEffect(() => {
     fetchUsers()
-    fetchRacsUser(monthsFilter)
+    fetchRacsUser({
+      dateEnd,
+      dateStart
+    })
   }, [])
 
   const racsUsers = useMemo(() => {
     const racsUsers: RacsUserReport[] = users?.map((user) => {
       const months: Record<MonthYear, RacsUser> = {}
       monthsFilter.forEach((month) => {
-        const racsMonth = racsReport
-          ?.find((r) => r.month === month)
-          ?.userRacsMonth.find((report) => report.userId === user.id)
-        if (racsMonth) {
-          months[month] = racsMonth
-        } else {
-          months[month] = {
-            month,
-            racsGoal: user.racsGoals || 0,
-            racsIds: [],
-            racsQuantity: 0,
-            userId: user.id
-          }
+        if (!racsReport) return
+        const racsUser = racsReport[month]?.filter((rac) => rac.user.id === user.id) || []
+        months[month] = {
+          month,
+          racsQuantity: racsUser.length,
+          racsGoal: user.racsGoals || 0,
+          racsIds: racsUser.map((rac) => rac.id),
+          userId: user.id
         }
       })
       return {
@@ -297,20 +271,41 @@ const HomeManagement = () => {
     })
     return racsUsers || []
   }, [users, racsReport, monthsFilter])
+  const handleFetchRacsUser = async () => {
+    await fetchRacsUser({
+      dateEnd,
+      dateStart
+    })
+    setMonthsFilter(getMonthsBetweenDates(dateStart, dateEnd))
+  }
+  const getAverageMonth = (month: string) => {
+    const average =
+      racsUsers.reduce((acc, curr) => acc + (curr.months[month]?.racsQuantity || 0), 0) /
+      racsUsers.length
+    return average || 0
+  }
+  const getPercentageMonth = (month: string) => {
+    const percentage =
+      racsUsers.reduce(
+        (acc, curr) => acc + getPercentage(curr.months[month]?.racsQuantity, curr.user.racsGoals),
+        0
+      ) / racsUsers.length
+    return percentage || 0
+  }
   return (
     <Grid container>
       <Grid container alignItems="center" justifyContent="space-between" flexDirection="row">
         <h2>Cumplimiento de RACS por colaborador</h2>
         <Grid item>
           <HeaderHome
-            containerRef={elementContainerRef}
-            divReportRef={elementReportRef}
-            endDate={endDate}
-            startDate={startDate}
-            fetchRacsUser={fetchRacsUser}
+            dateEnd={dateEnd}
+            dateStart={dateStart}
             months={monthsFilter}
-            setEndDate={setEndDate}
-            setStartDate={setStartDate}
+            setDateEnd={setDateEnd}
+            setDateStart={setDateStart}
+            divReportRef={elementReportRef}
+            containerRef={elementContainerRef}
+            fetchRacsUser={handleFetchRacsUser}
           />
         </Grid>
       </Grid>
@@ -321,7 +316,7 @@ const HomeManagement = () => {
         )}
 
         <TableContainer component={Paper} ref={elementReportRef}>
-          <Table size="small" padding="none" aria-label="a dense table">
+          <Table size="small" aria-label="a dense table">
             <TableHeaderRacs months={monthsFilter} />
             <TableBody>
               {racsUsers.map(({ user, months }) => (
@@ -330,30 +325,17 @@ const HomeManagement = () => {
                   {...{ user, months, monthsFilter, racsUsers, monthsUser: months }}
                 />
               ))}
-              <TableRow style={{ background: "#bbe5df38" }}>
+              <TableRow style={{ background: "#bbe5df38", minHeight: 50 }}>
                 <TableCell align="right" colSpan={4}>
                   <strong>PROMEDIO TOTAL</strong>
                 </TableCell>
                 {monthsFilter.map((month) => (
                   <Fragment key={month}>
                     <TableCell align="center" style={styles.borderLeft}>
-                      <strong>
-                        {racsUsers.reduce(
-                          (acc, curr) => acc + (curr.months[month]?.racsQuantity || 0),
-                          0
-                        ) / racsUsers.length}
-                      </strong>
+                      <strong>{getAverageMonth(month)}</strong>
                     </TableCell>
                     <TableCell align="right" style={styles.borderLeft} padding="none">
-                      {(
-                        racsUsers.reduce(
-                          (acc, curr) =>
-                            acc +
-                            getPercentage(curr.months[month]?.racsQuantity, curr.user.racsGoals),
-                          0
-                        ) / racsUsers.length
-                      ).toFixed(0)}
-                      %
+                      {getPercentageMonth(month).toFixed(0)}%
                     </TableCell>
                   </Fragment>
                 ))}
