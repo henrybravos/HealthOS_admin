@@ -65,50 +65,211 @@ const getMonthsBetweenDates = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => 
   months.push(endDate.format("YYYY-MM"))
   return months
 }
-const HomeManagement = () => {
-  const elementRef = useRef<HTMLDivElement>(null)
-  const currentDate = dayjs()
-  const lastYearDate = currentDate.subtract(1, "year")
-
-  const elementContainerRef = useRef<HTMLDivElement>(null)
-  const [startDate, setStartDate] = useState(lastYearDate)
-  const [endDate, setEndDate] = useState(currentDate)
-  const [isLoadingUser, users, fetchUsers] = useFetchApi(AuthService.getAllUsers)
-  const [isLoadingRacs, racsReport, fetchRacsUser] = useFetchApi(RacsService.getReportByMonth)
-  const monthsFilter = getMonthsBetweenDates(startDate, endDate)
-
-  console.log({ users, racsReport })
-  useEffect(() => {
-    fetchUsers()
-    fetchRacsUser(monthsFilter)
-  }, [])
-
+const TableHeaderRacs = ({ months }: { months: string[] }) => {
+  return (
+    <TableHead style={{ background: "#bbe5df38" }}>
+      <TableRow>
+        <TableCell colSpan={4} />
+        {months.map((month) => (
+          <TableCell style={styles.borderLeft} colSpan={2} key={month} align="center">
+            {month}
+          </TableCell>
+        ))}
+      </TableRow>
+      <TableRow>
+        <TableCell>DNI</TableCell>
+        <TableCell align="left">COLABORADOR</TableCell>
+        <TableCell align="left">CATEGORÍA</TableCell>
+        <TableCell align="left">META</TableCell>
+        {months.map((month) => (
+          <Fragment key={month}>
+            <TableCell style={styles.borderLeft} align="center">
+              #
+            </TableCell>
+            <TableCell style={styles.borderLeft} align="center">
+              %
+            </TableCell>
+          </Fragment>
+        ))}
+      </TableRow>
+    </TableHead>
+  )
+}
+type HomeManagementProps = {
+  startDate: dayjs.Dayjs
+  endDate: dayjs.Dayjs
+  months: string[]
+  containerRef: React.RefObject<HTMLDivElement>
+  divReportRef: React.RefObject<HTMLDivElement>
+  setStartDate: (date: dayjs.Dayjs) => void
+  setEndDate: (date: dayjs.Dayjs) => void
+  fetchRacsUser: (months: string[]) => void
+}
+const HeaderHome = ({
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  fetchRacsUser,
+  months,
+  divReportRef,
+  containerRef
+}: HomeManagementProps) => {
   const htmlToImageConvert = () => {
-    if (!elementRef.current || !elementContainerRef.current) return
-    const originalWidth = elementRef.current.style.width
-    const originalHeight = elementRef.current.style.height
+    if (!divReportRef.current || !containerRef.current) return
+    const originalWidth = divReportRef.current.style.width
+    const originalHeight = divReportRef.current.style.height
 
-    elementContainerRef.current.style.width = elementRef.current.scrollWidth + 50 + "px"
-    elementContainerRef.current.style.height = elementRef.current.scrollHeight + 16 + "px"
-    toPng(elementRef.current, {
+    containerRef.current.style.width = divReportRef.current.scrollWidth + 50 + "px"
+    containerRef.current.style.height = divReportRef.current.scrollHeight + 16 + "px"
+    toPng(divReportRef.current, {
       cacheBust: false,
-      height: elementRef.current.scrollHeight + 16,
-      width: elementRef.current.scrollWidth + 50
+      height: divReportRef.current.scrollHeight + 16,
+      width: divReportRef.current.scrollWidth + 50
     })
       .then((dataUrl) => {
         const link = document.createElement("a")
         link.download = "my-image-name.png"
         link.href = dataUrl
         link.click()
-        if (elementContainerRef.current) {
-          elementContainerRef.current.style.width = originalWidth
-          elementContainerRef.current.style.height = originalHeight
+        if (containerRef.current) {
+          containerRef.current.style.width = originalWidth
+          containerRef.current.style.height = originalHeight
         }
       })
       .catch((err) => {
         console.log(err)
       })
   }
+
+  return (
+    <Grid container gap={1}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker
+          slotProps={{
+            textField: { size: "small" }
+          }}
+          value={startDate}
+          onChange={(date) => date && setStartDate(date)}
+          label={"Desde >="}
+          views={["month", "year"]}
+        />
+        <DatePicker
+          slotProps={{
+            textField: { size: "small" }
+          }}
+          value={endDate}
+          onChange={(date) => date && setEndDate(date)}
+          label={"Hasta <"}
+          views={["month", "year"]}
+        />
+      </LocalizationProvider>
+      <Button
+        disabled={!startDate || !endDate}
+        color="info"
+        variant="outlined"
+        size="small"
+        onClick={() => fetchRacsUser(months)}
+      >
+        BUSCAR
+      </Button>
+      <Button color="info" variant="contained" size="small" onClick={htmlToImageConvert}>
+        DESCARGAR
+      </Button>
+    </Grid>
+  )
+}
+const TableRowRacs = ({
+  user,
+  monthsUser,
+  monthsFilter,
+  racsUsers
+}: {
+  user: UserInfo
+  monthsUser: Record<MonthYear, RacsUser>
+  monthsFilter: string[]
+  racsUsers: RacsUserReport[]
+}) => {
+  const goal = user.racsGoals || 0
+  return (
+    <TableRow key={user.id} style={{ minHeight: 30 }}>
+      <TableCell component="th" scope="row">
+        {user.dni}
+      </TableCell>
+      <TableCell
+        align="left"
+        style={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "200px"
+        }}
+      >
+        {user.name} {user.surname}
+      </TableCell>
+      <TableCell align="left">{user.category || ""}</TableCell>
+      <TableCell align="left">{user.racsGoals || 0}</TableCell>
+      {monthsFilter.map((month) => {
+        const quantity = monthsUser[month]?.racsQuantity ?? 0
+        const percentage = getPercentage(quantity, goal)
+        const maxRacs = Math.max(...racsUsers.map((user) => user.months[month]?.racsQuantity || 0))
+        const maxRacsFlex = getFlexMaxQuantity(maxRacs, quantity)
+        return (
+          <Fragment key={month}>
+            <TableCell
+              size="small"
+              style={styles.borderLeft}
+              width={200}
+              padding="none"
+              align="center"
+            >
+              <Grid container style={{ height: 24, position: "relative" }}>
+                <Grid style={{ ...styles.maxQuantityFlex, ...{ flex: maxRacsFlex } }} />
+                <Grid style={{ flex: 1 - maxRacsFlex, height: "100%" }} />
+                <strong style={styles.quantity}>{quantity}</strong>
+              </Grid>
+            </TableCell>
+            <TableCell
+              size="small"
+              padding="none"
+              width={200}
+              style={styles.borderLeft}
+              align="right"
+            >
+              <Grid container style={styles.percentage}>
+                <Grid
+                  style={{
+                    ...styles.circle,
+                    backgroundColor: getColorPercentage(percentage)
+                  }}
+                />
+                {percentage.toFixed(0)}%
+              </Grid>
+            </TableCell>
+          </Fragment>
+        )
+      })}
+    </TableRow>
+  )
+}
+const HomeManagement = () => {
+  const elementReportRef = useRef<HTMLDivElement>(null)
+  const currentDate = dayjs()
+  const lastYearDate = currentDate.subtract(1, "year")
+  const elementContainerRef = useRef<HTMLDivElement>(null)
+  const [startDate, setStartDate] = useState(lastYearDate)
+  const [endDate, setEndDate] = useState(currentDate)
+  const [isLoadingUser, users, fetchUsers] = useFetchApi(AuthService.getAllUsers)
+  const [isLoadingRacs, racsReport, fetchRacsUser] = useFetchApi(RacsService.getReportByMonth)
+
+  const monthsFilter = useMemo(
+    () => getMonthsBetweenDates(startDate, endDate),
+    [startDate, endDate]
+  )
+  useEffect(() => {
+    fetchUsers()
+    fetchRacsUser(monthsFilter)
+  }, [])
 
   const racsUsers = useMemo(() => {
     const racsUsers: RacsUserReport[] = users?.map((user) => {
@@ -141,145 +302,34 @@ const HomeManagement = () => {
       <Grid container alignItems="center" justifyContent="space-between" flexDirection="row">
         <h2>Cumplimiento de RACS por colaborador</h2>
         <Grid item>
-          <Grid container gap={1}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                slotProps={{
-                  textField: { size: "small" }
-                }}
-                value={startDate}
-                onChange={(date) => date && setStartDate(date)}
-                label={"Desde >="}
-                views={["month", "year"]}
-              />
-              <DatePicker
-                slotProps={{
-                  textField: { size: "small" }
-                }}
-                value={endDate}
-                onChange={(date) => date && setEndDate(date)}
-                label={"Hasta <"}
-                views={["month", "year"]}
-              />
-            </LocalizationProvider>
-            <Button
-              disabled={!startDate || !endDate}
-              color="info"
-              variant="outlined"
-              size="small"
-              onClick={() => fetchRacsUser(monthsFilter)}
-            >
-              BUSCAR
-            </Button>
-            <Button color="info" variant="contained" size="small" onClick={htmlToImageConvert}>
-              DESCARGAR
-            </Button>
-          </Grid>
+          <HeaderHome
+            containerRef={elementContainerRef}
+            divReportRef={elementReportRef}
+            endDate={endDate}
+            startDate={startDate}
+            fetchRacsUser={fetchRacsUser}
+            months={monthsFilter}
+            setEndDate={setEndDate}
+            setStartDate={setStartDate}
+          />
         </Grid>
       </Grid>
 
       <Grid container component={Paper} elevation={4} ref={elementContainerRef}>
-        {isLoadingRacs ||
-          (isLoadingUser && <LinearProgress variant="indeterminate" style={{ width: "100%" }} />)}
+        {(isLoadingRacs || isLoadingUser) && (
+          <LinearProgress variant="indeterminate" style={{ width: "100%" }} />
+        )}
 
-        <TableContainer component={Paper} ref={elementRef}>
-          <Table size="small" aria-label="a dense table">
-            <TableHead style={{ background: "#bbe5df38" }}>
-              <TableRow>
-                <TableCell colSpan={4} />
-                {monthsFilter.map((month) => (
-                  <TableCell style={styles.borderLeft} colSpan={2} key={month} align="center">
-                    {month}
-                  </TableCell>
-                ))}
-              </TableRow>
-              <TableRow>
-                <TableCell>DNI</TableCell>
-                <TableCell align="left">COLABORADOR</TableCell>
-                <TableCell align="left">CATEGORÍA</TableCell>
-                <TableCell align="left">META</TableCell>
-                {monthsFilter.map((month) => (
-                  <Fragment key={month}>
-                    <TableCell style={styles.borderLeft} align="center">
-                      #
-                    </TableCell>
-                    <TableCell style={styles.borderLeft} align="center">
-                      %
-                    </TableCell>
-                  </Fragment>
-                ))}
-              </TableRow>
-            </TableHead>
+        <TableContainer component={Paper} ref={elementReportRef}>
+          <Table size="small" padding="none" aria-label="a dense table">
+            <TableHeaderRacs months={monthsFilter} />
             <TableBody>
-              {racsUsers.map(({ user, months }) => {
-                const goal = user.racsGoals || 0
-                return (
-                  <TableRow key={user.id} style={{ minHeight: 30 }}>
-                    <TableCell component="th" scope="row">
-                      {user.dni}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "200px"
-                      }}
-                    >
-                      {user.name} {user.surname}
-                    </TableCell>
-                    <TableCell align="left">{user.category || ""}</TableCell>
-                    <TableCell align="left">{user.racsGoals || 0}</TableCell>
-                    {monthsFilter.map((month) => {
-                      const quantity = months[month]?.racsQuantity ?? 0
-                      const percentage = getPercentage(quantity, goal)
-                      //get max between user with same month
-                      const maxRacs = Math.max(
-                        ...racsUsers.map((user) => user.months[month]?.racsQuantity || 0)
-                      )
-                      const maxRacsFlex = getFlexMaxQuantity(maxRacs, quantity)
-                      return (
-                        <Fragment key={month}>
-                          <TableCell
-                            size="small"
-                            style={styles.borderLeft}
-                            width={200}
-                            padding="none"
-                            align="center"
-                          >
-                            <Grid container style={{ height: 24, position: "relative" }}>
-                              <Grid
-                                style={{ ...styles.maxQuantityFlex, ...{ flex: maxRacsFlex } }}
-                              />
-                              <Grid style={{ flex: 1 - maxRacsFlex, height: "100%" }} />
-                              <strong style={styles.quantity}>{quantity}</strong>
-                            </Grid>
-                          </TableCell>
-                          <TableCell
-                            size="small"
-                            padding="none"
-                            width={200}
-                            style={styles.borderLeft}
-                            align="right"
-                          >
-                            <Grid container style={styles.percentage}>
-                              <Grid
-                                style={{
-                                  ...styles.circle,
-                                  backgroundColor: getColorPercentage(percentage)
-                                }}
-                              />
-                              {percentage.toFixed(0)}%
-                            </Grid>
-                          </TableCell>
-                        </Fragment>
-                      )
-                    })}
-                  </TableRow>
-                )
-              })}
-
+              {racsUsers.map(({ user, months }) => (
+                <TableRowRacs
+                  key={user.id}
+                  {...{ user, months, monthsFilter, racsUsers, monthsUser: months }}
+                />
+              ))}
               <TableRow style={{ background: "#bbe5df38" }}>
                 <TableCell align="right" colSpan={4}>
                   <strong>PROMEDIO TOTAL</strong>
