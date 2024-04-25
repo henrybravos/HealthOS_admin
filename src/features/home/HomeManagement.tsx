@@ -3,7 +3,7 @@ import { Fragment } from "react/jsx-runtime"
 
 import { useFetchApi } from "@common/hooks"
 import { AuthService, RacsService } from "@core/services"
-import { UserCategoryEnum, UserInfo, UserRoleEnum } from "@core/types"
+import { UserInfo } from "@core/types"
 import {
   Button,
   Grid,
@@ -20,7 +20,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import dayjs from "dayjs"
-import { Timestamp } from "firebase/firestore"
 import { toPng } from "html-to-image"
 
 type MonthYear = string
@@ -55,200 +54,6 @@ const getPercentage = (racsQuantity?: number, goal?: number) => {
   percentage = percentage > 100 ? 100 : percentage
   return percentage || 0
 }
-const racsUsers: RacsUserReport[] = [
-  {
-    user: {
-      id: "1",
-      dni: "70408005",
-      name: "HENRY",
-      address: "AV. LOS ALAMOS 123",
-      phone: "987654321",
-      email: "",
-      roles: [UserRoleEnum.ADMIN],
-      createdAt: Timestamp.now(),
-      occupation: {
-        name: "N1",
-        id: "1"
-      },
-      surname: "BRAVO",
-      authId: "1",
-      category: UserCategoryEnum.N1,
-      racsGoals: 4
-    },
-    months: {
-      "2024-01": {
-        month: "2024-01",
-        userId: "1",
-        racsIds: ["1", "2", "3"],
-        racsGoal: 4,
-        racsQuantity: 3
-      },
-      "2024-02": {
-        month: "2024-02",
-        userId: "1",
-        racsIds: ["1"],
-        racsGoal: 4,
-        racsQuantity: 1
-      },
-      "2024-03": {
-        month: "2024-03",
-        userId: "1",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-04": {
-        month: "2024-04",
-        userId: "1",
-        racsIds: ["1"],
-        racsGoal: 4,
-        racsQuantity: 1
-      },
-      "2024-05": {
-        month: "2024-05",
-        userId: "1",
-        racsIds: ["1", "2", "3"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-06": {
-        month: "2024-06",
-        userId: "1",
-        racsIds: ["1", "2", "3", "4", "5"],
-        racsGoal: 4,
-        racsQuantity: 5
-      },
-      "2024-07": {
-        month: "2024-07",
-        userId: "1",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-08": {
-        month: "2024-08",
-        userId: "1",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-09": {
-        month: "2024-09",
-        userId: "1",
-        racsIds: [],
-        racsGoal: 4,
-        racsQuantity: 0
-      }
-    }
-  },
-  {
-    user: {
-      id: "2",
-      dni: "70408006",
-      name: "JUAN",
-      address: "AV. LOS ALAMOS 123",
-      phone: "987654321",
-      email: "",
-      roles: [UserRoleEnum.ADMIN],
-      createdAt: Timestamp.now(),
-      occupation: {
-        name: "N1",
-        id: "1"
-      },
-      surname: "PEREZ",
-      authId: "1",
-      category: UserCategoryEnum.N1,
-      racsGoals: 4
-    },
-    months: {
-      "2024-01": {
-        month: "2024-01",
-        userId: "2",
-        racsIds: ["1", "2", "3"],
-        racsGoal: 4,
-        racsQuantity: 3
-      },
-      "2024-02": {
-        month: "2024-02",
-        userId: "2",
-        racsIds: ["1", "2"],
-        racsGoal: 4,
-        racsQuantity: 2
-      },
-      "2024-03": {
-        month: "2024-03",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-04": {
-        month: "2024-04",
-        userId: "2",
-        racsIds: ["1"],
-        racsGoal: 4,
-        racsQuantity: 1
-      },
-
-      "2024-05": {
-        month: "2024-05",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-06": {
-        month: "2024-06",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-07": {
-        month: "2024-07",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-08": {
-        month: "2024-08",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      },
-      "2024-09": {
-        month: "2024-09",
-        userId: "2",
-        racsIds: [],
-        racsGoal: 4,
-        racsQuantity: 0
-      },
-      "2024-10": {
-        month: "2024-10",
-        userId: "2",
-        racsIds: [],
-        racsGoal: 4,
-        racsQuantity: 0
-      },
-      "2024-11": {
-        month: "2024-11",
-        userId: "2",
-        racsIds: ["1", "3"],
-        racsGoal: 4,
-        racsQuantity: 2
-      },
-      "2024-12": {
-        month: "2024-12",
-        userId: "2",
-        racsIds: ["1", "2", "3", "4"],
-        racsGoal: 4,
-        racsQuantity: 4
-      }
-    }
-  }
-]
 
 const getMonthsBetweenDates = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {
   const months = []
