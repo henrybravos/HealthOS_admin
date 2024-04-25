@@ -40,3 +40,17 @@ export type Racs = {
   controlCondition: string
   status: StatusRacs
 }
+export type MonthYear = string
+
+export type RacsUser = {
+  month: string
+  userId: string
+  racsIds: string[]
+  racsGoal: number
+  racsQuantity: number
+}
+
+export type RacsUserReport = {
+  user: UserInfo
+  months: Record<MonthYear, RacsUser>
+}
