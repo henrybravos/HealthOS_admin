@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from "react"
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Fragment } from "react/jsx-runtime"
 
 import { getMonthsBetweenDates } from "@common/helpers"
@@ -292,6 +292,12 @@ const HomeManagement = () => {
       ) / racsUsers.length
     return percentage || 0
   }
+  //get average user goal
+  const averageGoal = useMemo(() => {
+    const average =
+      racsUsers.reduce((acc, curr) => acc + (curr.user.racsGoals || 0), 0) / racsUsers.length
+    return average || 0
+  }, [racsUsers])
   return (
     <Grid container>
       <Grid container alignItems="center" justifyContent="space-between" flexDirection="row">
@@ -326,8 +332,11 @@ const HomeManagement = () => {
                 />
               ))}
               <TableRow style={{ background: "#bbe5df38", minHeight: 50 }}>
-                <TableCell align="right" colSpan={4}>
+                <TableCell align="right" colSpan={3}>
                   <strong>PROMEDIO TOTAL</strong>
+                </TableCell>
+                <TableCell align="right" colSpan={3}>
+                  <strong>{averageGoal.toFixed(1)}</strong>
                 </TableCell>
                 {monthsFilter.map((month) => (
                   <Fragment key={month}>
