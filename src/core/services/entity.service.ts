@@ -45,7 +45,7 @@ const addDocument = async <T>(collectionName: string, data: T): Promise<T> => {
 }
 
 const setDocument = async <T>(collectionName: string, data: T, uuid: string): Promise<T> => {
-  await setDoc(doc(db!, collectionName, uuid), data as unknown)
+  await setDoc(doc(db!, collectionName, uuid), data as Partial<unknown>, { merge: true })
   return {
     id: uuid,
     ...data

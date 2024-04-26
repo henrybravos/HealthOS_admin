@@ -14,12 +14,12 @@ Some features in this application
   - [x] protected with roles
   - [x] create/edit user category
   - [x] create/edit user goal
-  - [ ] disable user
+  - [x] disable user
 - [x] List RACS pagination
   - [ ] Filter listS
-- [ ] Dashboard RACS
-  - [ ] dates filters
-  - [ ] download pdf
+- [x] Dashboard RACS
+  - [x] dates filters
+  - [x] download img
 - [x] Deploy vercel
 
 ## Install and run
