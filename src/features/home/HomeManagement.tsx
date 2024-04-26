@@ -220,7 +220,7 @@ const TableRowRacs = ({
                     backgroundColor: getColorPercentage(percentage)
                   }}
                 />
-                {percentage.toFixed(1)}%
+                {percentage.toFixed(0)}%
               </Grid>
             </TableCell>
           </Fragment>
