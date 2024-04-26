@@ -57,7 +57,7 @@ const TableHeaderRacs = ({ months }: { months: string[] }) => {
         <TableCell>DNI</TableCell>
         <TableCell align="left">COLABORADOR</TableCell>
         <TableCell align="left">CATEGORÍA</TableCell>
-        <TableCell align="left">META</TableCell>
+        <TableCell align="center">META</TableCell>
         {months.map((month) => (
           <Fragment key={month}>
             <TableCell style={styles.borderLeft} align="center">
@@ -185,7 +185,7 @@ const TableRowRacs = ({
         {user.name} {user.surname}
       </TableCell>
       <TableCell align="left">{user.category || ""}</TableCell>
-      <TableCell align="left">{user.racsGoals || 0}</TableCell>
+      <TableCell align="center">{user.racsGoals || 0}</TableCell>
       {monthsFilter.map((month) => {
         const quantity = monthsUser[month]?.racsQuantity ?? 0
         const percentage = getPercentage(quantity, goal)
@@ -335,7 +335,7 @@ const HomeManagement = () => {
                 <TableCell align="right" colSpan={3}>
                   <strong>PROMEDIO TOTAL</strong>
                 </TableCell>
-                <TableCell align="right" colSpan={3}>
+                <TableCell align="center">
                   <strong>{averageGoal.toFixed(1)}</strong>
                 </TableCell>
                 {monthsFilter.map((month) => (
