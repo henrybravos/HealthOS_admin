@@ -220,7 +220,7 @@ const TableRowRacs = ({
                     backgroundColor: getColorPercentage(percentage)
                   }}
                 />
-                {percentage.toFixed(0)}%
+                {percentage.toFixed(1)}%
               </Grid>
             </TableCell>
           </Fragment>
@@ -335,7 +335,7 @@ const HomeManagement = () => {
                       <strong>{getAverageMonth(month).toFixed(1)}</strong>
                     </TableCell>
                     <TableCell align="right" style={styles.borderLeft} padding="none">
-                      {getPercentageMonth(month).toFixed(0)}%
+                      {getPercentageMonth(month).toFixed(1)}%
                     </TableCell>
                   </Fragment>
                 ))}
