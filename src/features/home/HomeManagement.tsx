@@ -332,7 +332,7 @@ const HomeManagement = () => {
                 {monthsFilter.map((month) => (
                   <Fragment key={month}>
                     <TableCell align="center" style={styles.borderLeft}>
-                      <strong>{getAverageMonth(month)}</strong>
+                      <strong>{getAverageMonth(month).toFixed(1)}</strong>
                     </TableCell>
                     <TableCell align="right" style={styles.borderLeft} padding="none">
                       {getPercentageMonth(month).toFixed(0)}%
