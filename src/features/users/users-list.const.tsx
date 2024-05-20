@@ -10,6 +10,7 @@ export const initUserForm: Partial<UserInfo> = {
 }
 export const RolesSpanish = {
   [UserRoleEnum.ADMIN]: "Administrador",
+  [UserRoleEnum.VISUALIZER]: "Visualizador",
   [UserRoleEnum.REGISTER]: "Registrador",
   [UserRoleEnum.NONE]: "Ninguno"
 }
@@ -23,8 +24,9 @@ export const initialStateUsersTable = {
 }
 export const getColumnsUsers: (
   setUserInfoSelected: Dispatch<SetStateAction<UserInfo | undefined>>,
-  setUserDeleted: Dispatch<SetStateAction<UserInfo | undefined>>
-) => GridColDef<UserInfo>[] = (setUserInfoSelected, setUserDeleted) => {
+  setUserDeleted: Dispatch<SetStateAction<UserInfo | undefined>>,
+  canWriter: boolean
+) => GridColDef<UserInfo>[] = (setUserInfoSelected, setUserDeleted, canWriter) => {
   return [
     {
       field: "id",
@@ -98,16 +100,24 @@ export const getColumnsUsers: (
         return (
           <>
             {!isDisabled && (
-              <Tooltip title="Editar/Restablecer contraseña">
-                <IconButton size="small" onClick={onClickEdit}>
-                  <Visibility fontSize="small" />
-                </IconButton>
+              <Tooltip title={!canWriter ? "Sin permisos" : "Editar/Restablecer contraseña"}>
+                <span>
+                  <IconButton disabled={!canWriter} size="small" onClick={onClickEdit}>
+                    <Visibility fontSize="small" />
+                  </IconButton>
+                </span>
               </Tooltip>
             )}
-            <Tooltip title={isDisabled ? "Activar usuario" : "Desactivar usuario"}>
-              <IconButton size="small" onClick={onClickDelete}>
-                <PersonOff color={isDisabled ? "info" : "action"} fontSize="small" />
-              </IconButton>
+            <Tooltip
+              title={
+                !canWriter ? "Sin permisos" : isDisabled ? "Activar usuario" : "Desactivar usuario"
+              }
+            >
+              <span>
+                <IconButton disabled={!canWriter} size="small" onClick={onClickDelete}>
+                  <PersonOff color={isDisabled ? "info" : "action"} fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
           </>
         )

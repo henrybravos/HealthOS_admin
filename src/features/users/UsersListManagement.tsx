@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { Datagrid, DialogComponent } from "@common/components"
 import { useFetchApi } from "@common/hooks"
+import { useAppContext } from "@context/useAppContext"
 import { AuthService } from "@core/services"
 import { UserInfo } from "@core/types"
 import { Button, Grid, Paper, Typography } from "@mui/material"
@@ -12,6 +13,7 @@ import { getColumnsUsers, initUserForm, initialStateUsersTable } from "./users-l
 const UserListManagement = () => {
   const [userDeleted, setUserDeleted] = useState<UserInfo>()
   const [userSelected, setUserSelected] = useState<UserInfo>()
+  const { canWriter } = useAppContext()
   const [isLoadingUsers, users, fetchUsers] = useFetchApi(AuthService.getAllUsers)
   const [isLoadingDeleted, responseActiveDisable, fetchActiveDisableUser, errorActiveDisable] =
     useFetchApi(AuthService.activeOrDisabledUser)
@@ -48,15 +50,17 @@ const UserListManagement = () => {
   return (
     <Grid container>
       <Grid container padding={1} justifyContent="flex-end">
-        <Button variant="outlined" size="small" onClick={handleOpenCreate}>
-          {userSelected ? "CERRAR" : "CREAR"}
-        </Button>
+        {canWriter && (
+          <Button variant="outlined" size="small" onClick={handleOpenCreate}>
+            {userSelected ? "CERRAR" : "CREAR"}
+          </Button>
+        )}
       </Grid>
       <Grid item md={userSelected ? 8 : 12} padding={1}>
         <Grid container component={Paper}>
           <Datagrid
             loading={isLoadingUsers}
-            columns={getColumnsUsers(setUserSelected, setUserDeleted)}
+            columns={getColumnsUsers(setUserSelected, setUserDeleted, !!canWriter)}
             disableRowSelectionOnClick
             rows={users ?? []}
             initialState={initialStateUsersTable}
