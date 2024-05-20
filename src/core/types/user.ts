@@ -15,7 +15,8 @@ export type User = {
 export enum UserRoleEnum {
   NONE = "",
   ADMIN = "admin",
-  REGISTER = "register"
+  REGISTER = "register",
+  VISUALIZER = "visualizer"
 }
 export enum UserCategoryEnum {
   NONE = "",

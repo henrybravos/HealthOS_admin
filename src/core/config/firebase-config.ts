@@ -42,8 +42,8 @@ if (!getApps().length) {
   db = getFirestore(app)
 }
 if (ENV.DEV) {
-  connectAuthEmulator(auth!, "http://localhost:9099")
-  connectFirestoreEmulator(db!, "localhost", 8080)
+  //connectAuthEmulator(auth!, "http://localhost:9099")
+  // connectFirestoreEmulator(db!, "localhost", 8080)
 } else {
   console.log("Production mode")
 }

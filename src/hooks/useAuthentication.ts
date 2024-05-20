@@ -47,7 +47,11 @@ export const useAuthentication = () => {
     }, 10)
   }
   const hasPermissions = (roles: UserRoleEnum[]) => {
-    return !!roles?.some((role) => role === UserRoleEnum.ADMIN)
+    const rolesAllowed = [UserRoleEnum.ADMIN, UserRoleEnum.VISUALIZER]
+    return roles.some((role) => rolesAllowed.includes(role))
+  }
+  const hasWriterPermissions = () => {
+    return userInfo?.roles.includes(UserRoleEnum.ADMIN)
   }
   const handleSignOut = () => {
     AuthService.signOut()
@@ -57,6 +61,7 @@ export const useAuthentication = () => {
     userInfo,
     loadingAuth,
     isAuthenticated: !!userInfo?.id,
-    handleSignOut
+    handleSignOut,
+    canWriter: hasWriterPermissions()
   }
 }
